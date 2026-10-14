@@ -2,8 +2,9 @@
 # Hospitalizations for ambulatory care sensitive conditions (ACSC) in Ecuador,
 # 2000-2024. Complete analysis script.
 #
-# Henriquez-Trujillo MC, Bonilla E, Henriquez-Trujillo AR.
+# Martínez-Abarca AL, Henríquez-Trujillo MC, Bonilla E, Henríquez-Trujillo AR.
 # Repository: https://github.com/rhenriquezitg/acsc_ecuador
+# Archive: https://doi.org/10.5281/zenodo.23366479
 #
 # The script reproduces every number, table and figure of the article and of
 # its supplementary material from the aggregated data in data/. Run it from the

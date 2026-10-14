@@ -1,8 +1,10 @@
 # Hospitalizations for ambulatory care sensitive conditions in Ecuador, 2000–2024
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23366479.svg)](https://doi.org/10.5281/zenodo.23366479)
+
 Data, code and supplementary material for:
 
-> Henriquez-Trujillo MC, Bonilla E, Henriquez-Trujillo AR. Hospitalizations for ambulatory care sensitive conditions in Ecuador, 2000–2024. Submitted to Revista de Saúde Pública.
+> Martínez-Abarca AL, Henríquez-Trujillo MC, Bonilla E, Henríquez-Trujillo AR. Hospitalizations for ambulatory care sensitive conditions in Ecuador, 2000–2024. Submitted to Revista de Saúde Pública.
 
 The study describes hospitalizations for ambulatory care sensitive conditions (ACSC) in Ecuador from 2000 to 2024. It uses all public and private hospital discharges recorded by the Instituto Nacional de Estadística y Censos (INEC) and examines:
 
@@ -77,8 +79,8 @@ The script takes a few minutes and writes `results/` and `figures/`. The package
 
 ## Citation
 
-Please cite the article and this repository (see `CITATION.cff`).
+Please cite the article and this repository: https://doi.org/10.5281/zenodo.23366479 (see `CITATION.cff`).
 
 ## Contact
 
-Aquiles Rodrigo Henriquez-Trujillo, Institute of Tropical Medicine, Antwerp. henriquezmd@gmail.com. ORCID [0000-0002-3094-4438](https://orcid.org/0000-0002-3094-4438).
+Aquiles Rodrigo Henríquez-Trujillo, Institute of Tropical Medicine, Antwerp. henriquezmd@gmail.com. ORCID [0000-0002-3094-4438](https://orcid.org/0000-0002-3094-4438).

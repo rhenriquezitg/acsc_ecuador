@@ -3,15 +3,23 @@ message: "If you use this material, please cite it as below."
 title: "Hospitalizations for ambulatory care sensitive conditions in Ecuador, 2000-2024: data, code and supplementary material"
 type: dataset
 authors:
-  - family-names: Henriquez-Trujillo
+  - family-names: Martínez-Abarca
+    given-names: Ana Lucía
+    affiliation: "Universidad de Almería, Research Group CTS-1127 Epidemiology and Public Health"
+  - family-names: Henríquez-Trujillo
     given-names: Maria Carolina
     affiliation: "Instituto Ecuatoriano de Seguridad Social, Hospital General San Francisco de Quito"
   - family-names: Bonilla
     given-names: Esteban
-  - family-names: Henriquez-Trujillo
+  - family-names: Henríquez-Trujillo
     given-names: Aquiles Rodrigo
     affiliation: "Institute of Tropical Medicine, Antwerp"
     orcid: "https://orcid.org/0000-0002-3094-4438"
+doi: 10.5281/zenodo.23366479
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23366479
+    description: "Zenodo archive of release v1.0.0"
 repository-code: "https://github.com/rhenriquezitg/acsc_ecuador"
 url: "https://github.com/rhenriquezitg/acsc_ecuador"
 license: CC-BY-4.0
