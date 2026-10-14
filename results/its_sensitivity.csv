@@ -1,0 +1,17 @@
+sensitivity,series,term,estimate,lcl,ucl,p,offset
+covid_2015,"All ACSC, 2015-2024 window",Pre-interruption trend (% per year),-1.050870212537247,-1.7407427876635073,-0.3561540818680764,0.0030816901112226524,pop
+covid_2015,"All ACSC, 2015-2024 window",Immediate level change (%),-44.73009528252215,-55.40457077754215,-31.500550151881267,6.112836570597613e-8,pop
+covid_2015,"All ACSC, 2015-2024 window",Change in trend after interruption (% per year),15.755897412888142,8.426661103914746,23.580562653508608,1.1641117553573611e-5,pop
+covid_2015,"All ACSC, 2015-2024 window",Post-interruption trend (% per year),14.539453167720918,7.247523209915374,22.327173060045236,5.237792055714814e-5,pop
+covid_excl3,"All ACSC, March-May 2020 left out",Pre-interruption trend (% per year),-1.7168720107859192,-2.275777937172929,-1.1547695807280878,2.6531508651971508e-9,pop
+covid_excl3,"All ACSC, March-May 2020 left out",Immediate level change (%),-42.72007392701841,-54.61621586930623,-27.705677396185855,2.7137123715004042e-6,pop
+covid_excl3,"All ACSC, March-May 2020 left out",Change in trend after interruption (% per year),15.728923903827297,8.169630525278793,23.81648862901422,2.249900959110908e-5,pop
+covid_excl3,"All ACSC, March-May 2020 left out",Post-interruption trend (% per year),13.742006400938767,6.205525269614109,21.81328595916845,2.3214785126823126e-4,pop
+reform_2014,"All ACSC, 2000-2014 window",Pre-interruption trend (% per year),2.803226523596458,1.7317913586270883,3.8859460009464497,2.3162559588544274e-7,pop
+reform_2014,"All ACSC, 2000-2014 window",Immediate level change (%),2.950877461110113,-1.6935791111353238,7.814759953416872,0.21692406490711671,pop
+reform_2014,"All ACSC, 2000-2014 window",Change in trend after interruption (% per year),-2.3893190201556225,-3.4320650326939317,-1.335313377316305,1.0186309784947901e-5,pop
+reform_2014,"All ACSC, 2000-2014 window",Post-interruption trend (% per year),0.3469294789344879,-0.04450787205984019,0.7398997441938615,0.08243617094300151,pop
+reform_oct,"All ACSC, interruption October 2008",Pre-interruption trend (% per year),2.84738837917784,1.9895302575315688,3.7124621488913156,5.042393138959682e-11,pop
+reform_oct,"All ACSC, interruption October 2008",Immediate level change (%),5.131060269631527,0.7245866945307489,9.730307128845638,0.021995598935465075,pop
+reform_oct,"All ACSC, interruption October 2008",Change in trend after interruption (% per year),-3.9163127327939473,-4.793493300649643,-3.031050303988847,1.36884475170736e-17,pop
+reform_oct,"All ACSC, interruption October 2008",Post-interruption trend (% per year),-1.1804369872619347,-1.57120683464681,-0.7881157536544614,4.25586585278379e-9,pop

@@ -1,0 +1,650 @@
+code,label
+A00,Cólera
+A000,"Cólera debido a Vibrio cholerae 01, biotipo cholerae"
+A001,"Cólera debido a Vibrio cholerae 01, biotipo el Tor"
+A009,"Cólera, no especificado"
+A01,Fiebres tifoidea y paratifoidea
+A010,Fiebre tifoidea
+A011,Fiebre paratifoidea A
+A012,Fiebre paratifoidea B
+A013,Fiebre paratifoidea C
+A014,"Fiebre paratifoidea, no especificada"
+A02,Otras infecciones debidas a Salmonella
+A020,Enteritis debida a Salmonella
+A021,Septicemia debida a Salmonella
+A022,Infecciones localizadas debidas a Salmonella
+A028,Otras infecciones especificadas como debidas a Salmonella
+A029,"Infección debida a Salmonella, no especificada"
+A03,Shigelosis
+A030,Shigelosis debida a Shigella dysenteriae
+A031,Shigelosis debida a Shigella flexneri
+A032,Shigelosis debida a Shigella boydii
+A033,Shigelosis debida a Shigella sonnei
+A038,Otras shigelosis
+A039,Shigelosis de tipo no especificado
+A04,Otras infecciones intestinales bacterianas
+A040,Infección debida a Escherichia coli enteropatógena
+A041,Infección debida a Escherichia coli enterotoxígena
+A042,Infección debida a Escherichia coli enteroinvasiva
+A043,Infección debida a Escherichia coli enterohemorrágica
+A044,Otras infecciones intestinales debidas a Escherichia coli
+A045,Enteritis debida a Campylobacter
+A046,Enteritis debida a Yersinia enterocolitica
+A047,Enterocolitis debida a Clostridium difficile
+A048,Otras infecciones intestinales bacterianas especificadas
+A049,"Infección intestinal bacteriana, no especificada"
+A05,"Otras intoxicaciones alimentarias bacterianas, no clasificadas en otra parte"
+A050,Intoxicación alimentaria estafilocócica
+A051,Botulismo
+A052,Intoxicación alimentaria debida a Clostridium perfringens [Clostridium welchii]
+A053,Intoxicación alimentaria debida a Vibrio parahaemolyticus
+A054,Intoxicación alimentaria debida a Bacillus cereus
+A058,Otras intoxicaciones alimentarias debidas a bacterias especificadas
+A059,"Intoxicación alimentaria bacteriana, no especificada"
+A06,Amebiasis
+A060,Disentería amebiana aguda
+A061,Amebiasis intestinal crónica
+A062,Colitis amebiana no disentérica
+A063,Ameboma intestinal
+A064,Absceso amebiano del hígado
+A065,Absceso amebiano del pulmón
+A066,Absceso amebiano del cerebro
+A067,Amebiasis cutánea
+A068,Infección amebiana de otras localizaciones
+A069,"Amebiasis, no especificada"
+A07,Otras enfermedades intestinales debidas a protozoarios
+A070,Balantidiasis
+A071,Giardiasis [lambliasis]
+A072,Criptosporidiosis
+A073,Isosporiasis
+A078,Otras enfermedades intestinales especificadas debidas a protozoarios
+A079,"Enfermedad intestinal debida a protozoarios, no especificada"
+A08,Infecciones intestinales debidas a virus y otros organismos especificados
+A080,Enteritis debida a rotavirus
+A081,Gastroenteropatía aguda debida al agente de Norwalk
+A082,Enteritis debida a adenovirus
+A083,Otras enteritis virales
+A084,"Infección intestinal viral, sin otra especificación"
+A085,Otras infecciones intestinales especificadas
+A09,Diarrea y gastroenteritis de presunto origen infeccioso
+A090,Otras gastroenteritis y colitis de origen infeccioso
+A099,Gastroenteritis y colitis de origen no especificado
+A15,"Tuberculosis respiratoria, confirmada bacteriológica e histológicamente"
+A150,"Tuberculosis del pulmón, confirmada por hallazgo microscópico del bacilo tuberculoso en esputo, con o sin cultivo"
+A151,"Tuberculosis del pulmón, confirmada únicamente por cultivo"
+A152,"Tuberculosis del pulmón, confirmada histológicamente"
+A153,"Tuberculosis del pulmón, confirmada por medios no especificados"
+A154,"Tuberculosis de ganglios linfáticos intratorácicos, confirmada bacteriológica e histológicamente"
+A155,"Tuberculosis de laringe, traquea y bronquios, confirmada bacteriológica e histológicamente"
+A156,"Pleuresía tuberculosa, confirmada bacteriológica e histológicamente"
+A157,"Tuberculosis respiratoria primaria, confirmada bacteriológica e histológicamente"
+A158,"Otras tuberculosis respiratorias, confirmadas bacteriológica e histológicamente"
+A159,"Tuberculosis respiratoria no especificada, confirmada bacteriológica e histológicamente"
+A16,"Tuberculosis respiratoria, no confirmada bacteriológica o histológicamente"
+A160,"Tuberculosis del pulmón, con examen bacteriológico e histológico negativos"
+A161,"Tuberculosis de pulmón, sin examen bacteriológico e histológico"
+A162,"Tuberculosis de pulmón, sin mención de confirmación bacteriológica o histológica"
+A163,"Tuberculosis de ganglios linfáticos intratorácicos, sin mención de confirmación bacteriológica o histológica"
+A164,"Tuberculosis de laringe, traquea y bronquios, sin mención de confirmación bacteriológica o histológica"
+A165,"Pleuresía tuberculosa, sin mención de confirmación bacteriológica o histológica"
+A167,"Tuberculosis respiratoria primaria, sin mención de confirmación bacteriológica o histológica"
+A168,"Otras tuberculosis respiratorias, sin mención de confirmación"
+A169,"Tuberculosis respiratoria no especificada, sin mención de confirmación bacteriológica o histológica"
+A17,Tuberculosis del sistema nervioso
+A170,Meningitis tuberculosa
+A171,Tuberculoma meníngeo
+A178,Otras tuberculosis del sistema nervioso
+A179,"Tuberculosis del sistema nervioso, no especificada"
+A18,Tuberculosis de otros órganos
+A180,Tuberculosis de huesos y articulaciones
+A181,Tuberculosis del aparato genitourinario
+A182,Linfadenopatía periférica tuberculosa
+A183,"Tuberculosis de los intestinos, el peritoneo y los ganglios mesentéricos"
+A184,Tuberculosis de la piel y el tejido subcutáneo
+A185,Tuberculosis del ojo
+A186,Tuberculosis del oído
+A187,Tuberculosis de glándulas suprarrenales
+A188,Tuberculosis de otros órganos especificados
+A19,Tuberculosis miliar
+A190,Tuberculosis miliar aguda de un solo sitio especificado
+A191,Tuberculosis miliar aguda de sitios múltiples
+A192,"Tuberculosis miliar aguda, no especificada"
+A198,Otras tuberculosis miliares
+A199,"Tuberculosis miliar, sin otra especificación"
+A33,Tétanos neonatal
+A34,Tétanos obstétrico
+A35,Otros tétanos
+A36,Difteria
+A360,Difteria faríngea
+A361,Difteria nasofaríngea
+A363,Difteria cutánea
+A368,Otras difterias
+A369,"Difteria, no especificada"
+A37,Tos ferina [tos convulsiva]
+A370,Tos ferina debida a Bordetella pertussis
+A371,Tos ferina debida a Bordetella parapertussis
+A378,Tos ferina debida a otras especies de Bordetella
+A379,"Tos ferina, no especificada"
+A46,Erisipela
+A50,Sífilis congénita
+A500,"Sífilis congénita precoz, sintomática"
+A501,"Sífilis congénita precoz, latente"
+A502,"Sífilis congénita precoz, sin otra especificación"
+A503,Oculopatía sifilítica congénita tardía
+A504,Neurosífilis congénita tardía [neurosífilis juvenil]
+A505,"Otras formas de sífilis congénita tardía, sintomática"
+A507,"Sífilis congénita tardía, sin otra especificación"
+A509,"Sífilis congénita, sin otra especificación"
+A51,Sífilis precoz
+A510,Sífilis genital primaria
+A511,Sífilis primaria anal
+A512,Sífilis primaria en otros sitios
+A513,Sífilis secundaria de piel y membranas mucosas
+A514,Otras sífilis secundarias
+A515,"Sífilis precoz, latente"
+A519,"Sífilis precoz, sin otra especificación"
+A52,Sífilis tardía
+A520,Sífilis cardiovascular
+A521,Neurosífilis sintomática
+A522,Neurosífilis asintomática
+A523,Neurosífilis no especificada
+A527,Otras sífilis tardías sintomáticas
+A528,"Sífilis tardía, latente"
+A529,"Sífilis tardía, no especificada"
+A53,Otras sífilis y las no especificadas
+A530,"Sífilis latente, no especificada como precoz o tardía"
+A539,"Sífilis, no especificada"
+A95,Fiebre amarilla
+A950,Fiebre amarilla selvática
+A951,Fiebre amarilla urbana
+A959,"Fiebre amarilla, no especificada"
+B05,Sarampión
+B050,Sarampión complicado con encefalitis
+B052,Sarampión complicado con neumonía
+B054,Sarampión con complicaciones intestinales
+B058,Sarampión con otras complicaciones
+B059,Sarampión sin complicaciones
+B06,Rubéola [sarampión alemán]
+B060,Rubéola con complicaciones neurológicas
+B068,Rubéola con otras complicaciones
+B069,Rubéola sin complicaciones
+B16,Hepatitis aguda tipo B
+B160,"Hepatitis aguda tipo B, con agente delta (coinfección), con coma hepático"
+B161,"Hepatitis aguda tipo B, con agente delta (coinfección), sin coma hepático"
+B162,"Hepatitis aguda tipo B, sin agente delta, con coma hepático"
+B169,"Hepatitis aguda tipo B, sin agente delta y sin coma hepático"
+B26,Parotiditis infecciosa
+B260,Orquitis por parotiditis
+B261,Meningitis por parotiditis
+B262,Encefalitis por parotiditis
+B263,Pancreatitis por parotiditis
+B268,Parotiditis infecciosa con otras complicaciones
+B269,"Parotiditis, sin complicaciones"
+B50,Paludismo [malaria] debido a Plasmodium falciparum
+B500,Paludismo debido a Plasmodium falciparum con complicaciones cerebrales
+B508,Otro paludismo grave y complicado debido a Plasmodium falciparum
+B509,"Paludismo debido a Plasmodium falciparum, sin otra especificación"
+B51,Paludismo [malaria] debido a Plasmodium vivax
+B510,Paludismo debido a Plasmodium vivax con ruptura esplénica
+B518,Paludismo debido a Plasmodium vivax con otras complicaciones
+B519,"Paludismo debido a Plasmodium vivax, sin complicaciones"
+B52,Paludismo [malaria] debido a Plasmodium malariae
+B520,Paludismo debido a Plasmodium malariae con nefropatía
+B528,Paludismo debido a Plasmodium malariae con otras complicaciones
+B529,"Paludismo debido a Plasmodium malariae, sin complicaciones"
+B53,Otro paludismo [malaria] confirmado parasitológicamente
+B530,Paludismo debido a Plasmodium ovale
+B531,Paludismo debido a plasmodios de los simios
+B538,"Otro paludismo confirmado parasitológicamente, no clasificado en otra parte"
+B54,Paludismo [malaria] no especificado
+B77,Ascariasis
+B770,Ascariasis con complicaciones intestinales
+B778,Ascariasis con otras complicaciones
+B779,"Ascariasis, no especificada"
+D50,Anemias por deficiencia de hierro
+D500,Anemia por deficiencia de hierro secundaria a pérdida de sangre (crónica)
+D501,Disfagia sideropénica
+D508,Otras anemias por deficiencia de hierro
+D509,Anemia por deficiencia de hierro sin otra especificación
+E10,Diabetes mellitus insulinodependiente
+E100,"Diabetes mellitus insulinodependiente, con coma"
+E101,"Diabetes mellitus insulinodependiente, con cetoacidosis"
+E102,"Diabetes mellitus insulinodependiente, con complicaciones renales"
+E103,"Diabetes mellitus insulinodependiente, con complicaciones oftálmicas"
+E104,"Diabetes mellitus insulinodependiente, con complicaciones neurológicas"
+E105,"Diabetes mellitus insulinodependiente, con complicaciones circulatorias periféricas"
+E106,"Diabetes mellitus insulinodependiente, con otras complicaciones especificadas"
+E107,"Diabetes mellitus insulinodependiente, con complicaciones múltiples"
+E108,"Diabetes mellitus insulinodependiente, con complicaciones no especificadas"
+E109,"Diabetes mellitus insulinodependiente, sin mención de complicación"
+E11,Diabetes mellitus no insulinodependiente
+E110,"Diabetes mellitus no insulinodependiente, con coma"
+E111,"Diabetes mellitus no insulinodependiente, con cetoacidosis"
+E112,"Diabetes mellitus no insulinodependiente, con complicaciones renales"
+E113,"Diabetes mellitus no insulinodependiente, con complicaciones oftálmicas"
+E114,"Diabetes mellitus no insulinodependiente, con complicaciones neurológicas"
+E115,"Diabetes mellitus no insulinodependiente, con complicaciones circulatorias periféricas"
+E116,"Diabetes mellitus no insulinodependiente, con otras complicaciones especificadas"
+E117,"Diabetes mellitus no insulinodependiente, con complicaciones múltiples"
+E118,"Diabetes mellitus no insulinodependiente, con complicaciones no especificadas"
+E119,"Diabetes mellitus no insulinodependiente, sin mención de complicación"
+E12,Diabetes mellitus asociada con desnutrición
+E120,"Diabetes mellitus asociada con desnutrición, con coma"
+E121,"Diabetes mellitus asociada con desnutrición, con cetoacidosis"
+E122,"Diabetes mellitus asociada con desnutrición, con complicaciones renales"
+E123,"Diabetes mellitus asociada con desnutrición, con complicaciones oftálmicas"
+E124,"Diabetes mellitus asociada con desnutrición, con complicaciones neurológicas"
+E125,"Diabetes mellitus asociada con desnutrición, con complicaciones circulatorias periféricas"
+E126,"Diabetes mellitus asociada con desnutrición, con otras complicaciones especificadas"
+E127,"Diabetes mellitus asociada con desnutrición, con complicaciones múltiples"
+E128,"Diabetes mellitus asociada con desnutrición, con complicaciones no especificadas"
+E129,"Diabetes mellitus asociada con desnutrición, sin mención de complicación"
+E13,Otras diabetes mellitus especificadas
+E130,"Otras diabetes mellitus especificadas, con coma"
+E131,"Otras Diabetes mellitus especificadas, con cetoacidosis"
+E132,"Otras diabetes mellitus especificadas, con complicaciones renales"
+E133,"Otras diabetes mellitus especificadas, con complicaciones oftálmicas"
+E134,"Otras diabetes mellitus especificadas, con complicaciones neurológicas"
+E135,"Otras diabetes mellitus especificadas, con complicaciones circulatorias periféricas"
+E136,"Otras diabetes mellitus especificadas, con otras complicaciones especificadas"
+E137,"Otras diabetes mellitus especificadas, con complicaciones múltiples"
+E138,"Otras diabetes mellitus especificadas, con complicaciones no especificadas"
+E139,"Otras diabetes mellitus especificadas, sin mención de complicación"
+E14,"Diabetes mellitus, no especificada"
+E140,"Diabetes mellitus no especificada, con coma"
+E141,"Diabetes mellitus no especificada, con cetoacidosis"
+E142,"Diabetes mellitus no especificada, con complicaciones renales"
+E143,"Diabetes mellitus no especificada, con complicaciones oftálmicas"
+E144,"Diabetes mellitus no especificada, con complicaciones neurológicas"
+E145,"Diabetes mellitus no especificada, con complicaciones circulatorias periféricas"
+E146,"Diabetes mellitus no especificada, con otras complicaciones especificadas"
+E147,"Diabetes mellitus no especificada, con complicaciones múltiples"
+E148,"Diabetes mellitus no especificada, con complicaciones no especificadas"
+E149,"Diabetes mellitus no especificada, sin mención de complicación"
+E40,Kwashiorkor
+E41,Marasmo nutricional
+E42,Kwashiorkor marasmático
+E43,"Desnutrición proteicocalórica severa, no especificada"
+E44,Desnutrición proteicocalórica de grado moderado y leve
+E440,Desnutrición proteicocalórica moderada
+E441,Desnutrición proteicocalórica leve
+E45,Retardo del desarrollo debido a desnutrición proteicocalórica
+E46,"Desnutrición proteicocalórica, no especificada"
+E50,Deficiencia de vitamina A
+E500,Deficiencia de vitamina A con xerosis conjuntival
+E501,Deficiencia de vitamina A con mancha de Bitot y xerosis conjuntival
+E503,Deficiencia de vitamina A con ulceración corneal y xerosis
+E507,Otras manifestaciones oculares de deficiencia de vitamina A
+E508,Otras manifestaciones de deficiencia de vitamina A
+E509,"Deficiencia de vitamina A, no especificada"
+E51,Deficiencia de tiamina
+E511,Beriberi
+E512,Encefalopatía de Wernicke
+E518,Otras manifestaciones de la deficiencia de tiamina
+E519,"Deficiencia de tiamina, no especificada"
+E52,Deficiencia de niacina [pelagra]
+E53,Deficiencias de otras vitaminas del grupo B
+E530,Deficiencia de riboflavina
+E531,Deficiencia de piridoxina
+E538,Deficiencia de otras vitaminas del grupo B
+E539,"Deficiencia de vitamina B, no especificada"
+E54,Deficiencia de ácido ascórbico
+E55,Deficiencia de vitamina D
+E550,Raquitismo activo
+E559,"Deficiencia de vitamina D, no especificada"
+E56,Otras deficiencias de vitaminas
+E560,Deficiencia de vitamina E
+E561,Deficiencia de vitamina K
+E568,Deficiencia de otras vitaminas
+E569,"Deficiencia de vitamina, no especificada"
+E58,Deficiencia dietética de calcio
+E59,Deficiencia dietética de selenio
+E60,Deficiencia dietética de zinc
+E61,Deficiencias de otros elementos nutricionales
+E610,Deficiencia de cobre
+E611,Deficiencia de hierro
+E612,Deficiencia de magnesio
+E613,Deficiencia de manganeso
+E614,Deficiencia de cromo
+E615,Deficiencia de molibdeno
+E617,Deficiencia de múltiples elementos nutricionales
+E618,Deficiencia de otros elementos nutricionales especificados
+E619,"Deficiencia de otro elemento nutricional, no especificado"
+E63,Otras deficiencias nutricionales
+E630,Deficiencia de ácidos grasos esenciales [AGE]
+E631,Desequilibrio de los constituyentes en la dieta
+E638,Otras deficiencias nutricionales especificadas
+E639,"Deficiencia nutricional, no especificada"
+E64,Secuelas de la desnutrición y de otras deficiencias nutricionales
+E640,Secuelas de la desnutrición proteicocalórica
+E641,Secuelas de la deficiencia de vitamina A
+E642,Secuelas de la deficiencia de vitamina C
+E643,Secuelas del raquitismo
+E648,Secuelas de otras deficiencias nutricionales
+E649,Secuelas de la deficiencia nutricional no especificada
+E86,Depleción del volumen
+G00,"Meningitis bacteriana, no clasificada en otra parte"
+G000,Meningitis por hemófilos
+G40,Epilepsia
+G400,Epilepsia y síndromes epilépticos idiopáticos relacionados con localizaciones (focales)(parciales) y con ataques d
+G401,Epilepsia y síndromes epilépticos sintomáticos relacionados con localizaciones (focales)(parciales) y con ataques
+G402,Epilepsia y síndromes epilépticos sintomáticos relacionados con localizaciones (focales)(parciales) y con ataques
+G403,Epilepsia y síndromes epilépticos idiopáticos generalizados
+G404,Otras epilepsias y síndromes epilépticos generalizados
+G405,Síndromes epilépticos especiales
+G406,"Ataques de gran mal, no especificados (con o sin pequeño mal)"
+G407,"Pequeño mal, no especificado (sin ataque de gran mal)"
+G408,Otras epilepsias
+G409,"Epilepsia, tipo no especificado"
+G41,Estado de mal epiléptico
+G410,Estado de gran mal epiléptico
+G411,Estado de pequeño mal epiléptico
+G412,Estado de mal epiléptico parcial complejo
+G418,Otros estados epilépticos
+G419,Estado de mal epiléptico de tipo no especificado
+G45,Ataques de isquemia cerebral transitoria y síndromes afines
+G450,Síndrome arterial vértebro-basilar
+G451,Síndrome de la arteria carótida (hemisférico)
+G452,Síndromes arteriales precerebrales bilaterales y múltiples
+G453,Amaurosis fugaz
+G454,Amnesia global transitoria
+G458,Otras isquemias cerebrales transitorias y síndromes afines
+G459,"Isquemia cerebral transitoria, sin otra especificación"
+G46,Síndromes vasculares encefálicos en enfermedades cerebrovasculares
+G460,Síndrome de la arteria cerebral media
+G461,Síndrome de la arteria cerebral anterior
+G462,Síndrome de la arteria cerebral posterior
+G463,Síndromes apopléticos del tallo encefálico
+G464,Síndrome de infarto cerebeloso
+G465,Síndrome lacunar motor puro
+G466,Síndrome lacunar sensorial puro
+G467,Otros síndromes lacunares
+G468,Otros síndromes vasculares encefálicos en enfermedades cerebrovasculares
+H66,Otitis media supurativa y la no especificada
+H660,Otitis media supurativa aguda
+H661,Otitis media tubotimpánica supurativa crónica
+H662,Otitis media supurativa crónica aticoantral
+H663,Otras otitis medias crónicas supurativas
+H664,"Otitis media supurativa, sin otra especificación"
+H669,"Otitis media, no especificada"
+I00,Fiebre reumática sin mención de complicación cardíaca
+I01,Fiebre reumática con complicación cardíaca
+I010,Pericarditis reumática aguda
+I011,Endocarditis reumática aguda
+I012,Miocarditis reumática aguda
+I018,Otras enfermedades reumáticas agudas del corazón
+I019,"Enfermedad reumática aguda del corazón, no especificada"
+I02,Corea reumática
+I020,Corea reumática con complicación cardíaca
+I029,Corea reumática sin mención de complicación cardíaca
+I10,Hipertensión esencial (primaria)
+I11,Enfermedad cardíaca hipertensiva
+I110,Enfermedad cardíaca hipertensiva con insuficiencia cardíaca (congestiva)
+I119,Enfermedad cardíaca hipertensiva sin insuficiencia cardíaca (congestiva)
+I20,Angina de pecho
+I200,Angina inestable
+I201,Angina de pecho con espasmo documentado
+I208,Otras formas especificadas de angina de pecho
+I209,"Angina de pecho, no especificada"
+I50,Insuficiencia cardíaca
+I500,Insuficiencia cardíaca congestiva
+I501,Insuficiencia ventricular izquierda
+I509,"Insuficiencia cardíaca, no especificada"
+I63,Infarto cerebral
+I630,Infarto cerebral debido a trombosis de arterias precerebrales
+I631,Infarto cerebral debido a embolia de arterias precerebrales
+I632,Infarto cerebral debido a oclusión o estenosis no especificada de arterias precerebrales
+I633,Infarto cerebral debido a trombosis de arterias cerebrales
+I634,Infarto cerebral debido a embolia de arterias cerebrales
+I635,Infarto cerebral debido a oclusión o estenosis no especificada de arterias cerebrales
+I636,"Infarto cerebral debido a trombosis de venas cerebrales, no piógeno"
+I638,Otros Infartos cerebrales
+I639,"Infarto cerebral, no especificado"
+I64,"Accidente vascular encefálico agudo, no especificado como hemorrágico o isquémico"
+I65,Oclusión y estenosis de las arterias precerebrales sin  ocasionar infarto cerebral
+I650,Oclusión y estenosis de arteria vertebral
+I651,Oclusión y estenosis de arteria basilar
+I652,Oclusión y estenosis de arteria carótida
+I653,Oclusión y estenosis múltiple bilateral de arterias precerebrales
+I658,Oclusión y estenosis de Otras arterias precerebrales
+I659,Oclusión y estenosis de arteria precerebral no especificada
+I66,Oclusión y estenosis de las arterias cerebrales sin  ocasionar infarto cerebral
+I660,Oclusión y estenosis de la arteria cerebral media
+I661,Oclusión y estenosis de la arteria cerebral anterior
+I662,Oclusión y estenosis de la arteria cerebral posterior
+I663,Oclusión y estenosis de arterias cerebelosas
+I664,Oclusión y estenosis múltiple bilateral de arterias cerebrales
+I668,Oclusión y estenosis de otras arterias cerebrales
+I669,Oclusión y estenosis de arteria cerebral no especificada
+I67,Otras enfermedades cerebrovasculares
+I670,"Disección de arterias cerebrales, sin ruptura"
+I671,"Aneurisma cerebral, sin ruptura"
+I672,Aterosclerosis cerebral
+I673,Leucoencefalopatía vascular progresiva
+I674,Encefalopatía hipertensiva
+I675,Enfermedad de Moyamoya
+I676,Trombosis apiógena del sistema venoso intracraneal
+I677,"Arteritis cerebral, no clasificada en otra parte"
+I678,Otras enfermedades cerebrovasculares especificadas
+I679,"Enfermedad cerebrovascular, no especificada"
+I69,Secuelas de enfermedad cerebrovascular
+I690,Secuelas de hemorragia subaracnoidea
+I691,Secuelas de hemorragia intraencefálica
+I692,Secuelas de otras hemorragias intracraneales no traumáticas
+I693,Secuelas de infarto cerebral
+I694,"Secuelas de accidente vascular encéfalico, no especificado como hemorrágico o isquémico"
+I698,Secuelas de otras enfermedades cerebrovasculares y de las no especificadas
+J00,Rinofaringitis aguda [resfriado común]
+J01,Sinusitis aguda
+J010,Sinusitis maxilar aguda
+J011,Sinusitis frontal aguda
+J012,Sinusitis etmoidal aguda
+J013,Sinusitis esfenoidal aguda
+J014,Pansinusitis aguda
+J018,Otras sinusitis agudas
+J019,"Sinusitis aguda, no especificada"
+J02,Faringitis aguda
+J020,Faringitis estreptocócica
+J028,Faringitis aguda debida a otros microorganismos especificados
+J029,"Faringitis aguda, no especificada"
+J03,Amigdalitis aguda
+J030,Amigdalitis estreptocócica
+J038,Amigdalitis aguda debida a otros microorganismos especificados
+J039,"Amigdalitis aguda, no especificada"
+J06,"Infecciones agudas de las vías respiratorias superiores, de sitios múltiples o no especificados"
+J060,Laringofaringitis aguda
+J068,Otras infecciones agudas de sitios múltiples de las vías respiratorias superiores
+J069,"Infección aguda de las vías respiratorias superiores, no especificada"
+J13,Neumonía debida a Streptococcus pneumoniae
+J14,Neumonía debida a Haemophilus influenzae
+J15,"Neumonía bacteriana, no clasificada en otra parte"
+J153,Neumonía debida a estreptococos del grupo B
+J154,Neumonía debida a otros estreptococos
+J158,Otras neumonías bacterianas
+J159,"Neumonía bacteriana, no especificada"
+J18,"Neumonía, organismo no especificado"
+J181,"Neumonía lobar, no especificada"
+J20,Bronquitis aguda
+J200,Bronquitis aguda debida a Mycoplasma pneumoniae
+J201,Bronquitis aguda debida a Haemophilus influenzae
+J202,Bronquitis aguda debida a estreptococos
+J203,Bronquitis aguda debida a virus Coxsackie
+J204,Bronquitis aguda debida a virus parainfluenza
+J205,Bronquitis aguda debida a virus sincitial respiratorio
+J206,Bronquitis aguda debida a rinovirus
+J207,Bronquitis aguda debida a virus ECHO
+J208,Bronquitis aguda debida a otros microorganismos especificados
+J209,"Bronquitis aguda, no especificada"
+J21,Bronquiolitis aguda
+J210,Bronquiolitis aguda debida a virus sincitial respiratorio
+J211,Bronquiolitis aguda debida a metapneumovirus humano
+J218,Bronquiolitis aguda debida a otros microorganismos especificados
+J219,"Bronquiolitis aguda, no especificada"
+J31,"Rinitis, rinofaringitis y faringitis crónicas"
+J310,Rinitis crónica
+J311,Rinofaringitis crónica
+J312,Faringitis crónica
+J40,"Bronquitis, no especificada como aguda o crónica"
+J41,Bronquitis crónica simple y mucopurulenta
+J410,Bronquitis crónica simple
+J411,Bronquitis crónica mucopurulenta
+J418,Bronquitis crónica mixta simple y mucopurulenta
+J42,Bronquitis crónica no especificada
+J43,Enfisema
+J430,Síndrome de MacLeod
+J431,Enfisema panlobular
+J432,Enfisema centrolobular
+J438,Otros tipos de enfisema
+J439,"Enfisema, no especificado"
+J44,Otras enfermedades pulmonares obstructivas crónicas
+J440,Enfermedad pulmonar obstructiva crónica con infección aguda de las vías respiratorias inferiores
+J441,"Enfermedad pulmonar obstructiva crónica con exacerbación aguda, no especificada"
+J448,Otras enfermedades pulmonares obstructivas crónicas especificadas
+J449,"Enfermedad pulmonar obstructiva crónica, no especificada"
+J45,Asma
+J450,Asma predominantemente alérgica
+J451,Asma no alérgica
+J458,Asma mixta
+J459,"Asma, no especificado"
+J46,Estado asmático
+J47,Bronquiectasia
+J81,Edema pulmonar
+K25,Úlcera gástrica
+K250,"Úlcera gástrica, aguda con hemorragia"
+K251,"Úlcera gastrica, aguda con perforación"
+K252,"Úlcera gástrica, aguda con hemorragia y perforación"
+K253,"Úlcera gástrica, aguda sin hemorragia ni perforación"
+K254,"Úlcera gástrica, crónica o no especificada, con hemorragia"
+K255,"Úlcera gástrica, crónica o no especificada, con perforación"
+K256,"Úlcera gástrica, crónica o no especificada, con hemorragia y perforación"
+K257,"Úlcera gástrica, crónica sin hemorragia ni perforación"
+K259,"Úlcera gástrica, no especificada como aguda ni crónica, sin hemorragia ni perforación"
+K26,Úlcera duodenal
+K260,"Úlcera duodenal, aguda con hemorragia"
+K261,"Úlcera duodenal, aguda con perforación"
+K262,"Úlcera duodenal, aguda con hemorragia y perforación"
+K263,"Úlcera duodenal, aguda sin hemorragia ni perforación"
+K264,"Úlcera duodenal, crónica o no especificada, con hemorragia"
+K265,"Úlcera duodenal, crónica o no especificada, con perforación"
+K266,"Úlcera duodenal, crónica o no especificada, con hemorragia y perforación"
+K267,"Úlcera duodenal, crónica sin hemorragia ni perforación"
+K269,"Úlcera duodenal, no especificada como aguda ni crónica, sin hemorragia ni perforación"
+K27,"Úlcera péptica, de sitio no especificado"
+K270,"Úlcera péptica, de sitio no especificado, aguda con hemorragia"
+K271,"Úlcera péptica, de sitio no especificado, aguda con perforación"
+K272,"Úlcera péptica, de sitio no especificado, aguda con hemorragia y perforación"
+K273,"Úlcera péptica, de sitio no especificado, aguda sin hemorragia ni perforación"
+K274,"Úlcera péptica, de sitio no especificado, crónica o no especificada, con hemorragia"
+K275,"Úlcera péptica, de sitio no especificado, crónica o no especificada, con perforación"
+K276,"Úlcera péptica, de sitio no especificado, crónica o no especificada, con hemorragia y perforación"
+K277,"Úlcera péptica, de sitio no especificado, crónica sin  hemorragia ni perforación"
+K279,"Úlcera péptica, de sitio no especificado, no especificada como aguda ni crónica, sin  hemorragia ni perforación"
+K28,Úlcera gastroyeyunal
+K280,"Úlcera gastroyeyunal, aguda con hemorragia"
+K281,"Úlcera gastroyeyunal, aguda con perforación"
+K282,"Úlcera gastroyeyunal, aguda con hemorragia y perforación"
+K283,"Úlcera gastroyeyunal, aguda sin hemorragia ni perforación"
+K284,"Úlcera gastroyeyunal, crónica o no especificada, con hemorragia"
+K285,"Úlcera gastroyeyunal, crónica o no especificada, con perforación"
+K286,"Úlcera gastroyeyunal, crónica o no especificada, con hemorragia y perforación"
+K287,"Úlcera gastroyeyunal, crónica sin hemorragia ni perforación"
+K289,"Úlcera gastroyeyunal, no especificada como aguda ni crónica, sin hemorragia ni perforación"
+K92,Otras enfermedades del sistema digestivo
+K920,Hematemesis
+K921,Melena
+K922,"Hemorragia gastrointestinal, no especificada"
+L01,Impétigo
+L010,Impétigo [cualquier sitio anatómico] [cualquier organismo]
+L011,Impetiginización de otras dermatosis
+L02,"Absceso cutáneo, furúnculo y ántrax"
+L020,"Absceso cutáneo, furúnculo y ántrax de la cara"
+L021,"Absceso cutáneo, furúnculo y ántrax del cuello"
+L022,"Absceso cutáneo, furúnculo y ántrax del tronco"
+L023,"Absceso cutáneo, furúnculo y ántrax de glúteos"
+L024,"Absceso cutáneo, furúnculo y ántrax de miembro"
+L028,"Absceso cutáneo, furúnculo y ántrax de otros sitios"
+L029,"Absceso cutáneo, furúnculo y ántrax de sitio no especificado"
+L03,Celulitis
+L030,Celulitis de los dedos de la mano y del pie
+L031,Celulitis de otras partes de los miembros
+L032,Celulitis de la cara
+L033,Celulitis del tronco
+L038,Celulitis de otros sitios
+L039,Celulitis de sitio no especificado
+L04,Linfadenitis aguda
+L040,"Linfadenitis aguda de cara, cabeza y cuello"
+L041,Linfadenitis aguda del tronco
+L042,Linfadenitis aguda del miembro superior
+L043,Linfadenitis aguda del miembro inferior
+L048,Linfadenitis aguda de otros sitios
+L049,Linfadenitis aguda de sitio no especificado
+L08,Otras infecciones locales de la piel y del tejido subcutáneo
+L080,Pioderma
+L081,Eritrasma
+L088,Otras infecciones locales especificadas de la piel y del tejido subcutáneo
+L089,"Infección local de la piel y del tejido subcutáneo, no especificada"
+N10,Nefritis tubulointersticial aguda
+N11,Nefritis  tubulointersticial crónica
+N110,Pielonefritis crónica no obstructiva asociada con reflujo
+N111,Pielonefritis crónica obstructiva
+N118,Otras nefritis tubulointersticiales crónicas
+N119,"Nefritis tubulointersticial crónica, sin otra especificación"
+N12,"Nefritis tubulointersticial, no especificada como aguda o crónica"
+N30,Cistitis
+N300,Cistitis aguda
+N301,Cistitis intersticial (crónica)
+N302,Otras cistitis crónicas
+N303,Trigonitis
+N304,Cistitis por irradiación
+N308,Otras cistitis
+N309,"Cistitis, no especificada"
+N34,Uretritis y síndrome uretral
+N340,Absceso uretral
+N341,Uretritis no específica
+N342,Otras uretritis
+N343,"Síndrome uretral, no especificado"
+N39,Otros trastornos del sistema urinario
+N390,"Infección de vías urinarias, sitio no especificado"
+N70,Salpingitis y ooforitis
+N700,Salpingitis y ooforitis aguda
+N701,Salpingitis y ooforitis crónica
+N709,"Salpingitis y ooforitis, no especificadas"
+N71,"Enfermedad inflamatoria del útero, excepto del cuello uterino"
+N710,Enfermedad inflamatoria aguda del útero
+N711,Enfermedad inflamatoria crónica del útero
+N719,"Enfermedad inflamatoria del útero, no especificada"
+N72,Enfermedad inflamatoria del cuello uterino
+N73,Otras enfermedades pélvicas inflamatorias femeninas
+N730,Parametritis y celulitis pélvica aguda
+N731,Parametritis y celulitis pélvica crónica
+N732,Parametritis y celulitis pélvica no especificada
+N733,"Peritonitis pélvica aguda, femenina"
+N734,"Peritonitis pélvica crónica, femenina"
+N735,"Peritonitis pélvica femenina, no especificada"
+N736,Adherencias peritoneales pélvicas femeninas
+N738,Otras enfermedades inflamatorias pélvicas femeninas
+N739,"Enfermedad inflamatoria pélvica femenina, no especificada"
+N75,Enfermedades de la glándula de Bartholin
+N750,Quiste de la glándula de Bartholin
+N751,Absceso de la glándula de Bartholin
+N758,Otras enfermedades de la glándula de Bartholin
+N759,"Enfermedad de la glándula de Bartholin, no especificada"
+N76,Otras afecciones inflamatorias de la vagina y de la vulva
+N760,Vaginitis aguda
+N761,Vaginitis subaguda y crónica
+N762,Vulvitis aguda
+N763,Vulvitis subaguda y crónica
+N764,Absceso vulvar
+N765,Ulceración de la vagina
+N766,Ulceración de la vulva
+N768,Otras inflamaciones especificadas de la vagina y de la vulva
+O23,Infección de las vías genitourinarias en el embarazo
+O230,Infección del riñón en el embarazo
+O231,Infección de la vejiga urinaria en el embarazo
+O232,Infección de la uretra en el embarazo
+O233,Infección de otras partes de las vías urinarias en el embarazo
+O234,Infección no especificada de las vías urinarias en el embarazo
+O235,Infección genital en el embarazo
+O239,Otras Infecciones y las no especificadas de las vías genitourinarias en el embarazo
+P35,Enfermedades virales congénitas
+P350,Síndrome de rubéola congénita

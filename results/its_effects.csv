@@ -1,0 +1,217 @@
+design,series,term,estimate,lcl,ucl,p,offset
+reform,All ACSC,Pre-interruption trend (% per year),2.795015940599832,1.7277498321640161,3.8734791604245755,2.2563440213859298e-7,pop
+reform,All ACSC,Immediate level change (%),7.064195707664389,1.4086956394636418,13.035099507465553,0.013694931796041724,pop
+reform,All ACSC,Change in trend after interruption (% per year),-3.699139664904616,-4.730191689111074,-2.6569291394324512,6.736750343505699e-12,pop
+reform,All ACSC,Post-interruption trend (% per year),-1.00751526760392,-1.4053398823453245,-0.6080854500664867,8.277459292422025e-7,pop
+reform,Chronic,Pre-interruption trend (% per year),3.668124799860162,3.181337863794842,4.157208289992598,7.192493403142178e-51,pop
+reform,Chronic,Immediate level change (%),19.177140007688976,10.316273809788168,28.749732110259863,8.559737791051605e-6,pop
+reform,Chronic,Change in trend after interruption (% per year),-5.232172206894425,-6.121638328221768,-4.334278691150518,5.751900627057055e-29,pop
+reform,Chronic,Post-interruption trend (% per year),-1.7559700133267575,-2.5867449848323343,-0.9181098966510093,4.337765069817945e-5,pop
+reform,Infectious,Pre-interruption trend (% per year),5.352495892909026,4.0664681874053255,6.65441601109984,8.740029511503278e-17,pop
+reform,Infectious,Immediate level change (%),0.8319197869720574,-4.777251096469781,6.7715032909477335,0.7766403285113168,pop
+reform,Infectious,Change in trend after interruption (% per year),-6.845335539225994,-8.05734119516318,-5.617352993680447,2.612845813847477e-26,pop
+reform,Infectious,Post-interruption trend (% per year),-1.8592359499098654,-2.346736336360733,-1.3693018851785865,1.5062105613660186e-13,pop
+reform,Vaccine-preventable,Pre-interruption trend (% per year),-12.428898917680254,-13.438566961392883,-11.407453925242194,1.9630157669450898e-111,pop
+reform,Vaccine-preventable,Immediate level change (%),-18.747153534905802,-29.734042733214338,-6.042338061180718,0.005097478591837266,pop
+reform,Vaccine-preventable,Change in trend after interruption (% per year),22.94707412893875,20.292603092009443,25.66012080813349,8.093238238656577e-77,pop
+reform,Vaccine-preventable,Post-interruption trend (% per year),7.666106563207542,5.900096161508683,9.461567294527939,2.067489955410005e-18,pop
+reform,Other acute,Pre-interruption trend (% per year),-0.7493423647691788,-3.044279583206422,1.5999159067624946,0.5285876910636014,pop
+reform,Other acute,Immediate level change (%),15.962493571754099,4.782938192459452,28.334823849660175,0.004193243349250911,pop
+reform,Other acute,Change in trend after interruption (% per year),2.5810639814531022,0.17349716435006712,5.046494187006156,0.03546402841880314,pop
+reform,Other acute,Post-interruption trend (% per year),1.8123806108091056,1.1597189389453977,2.4692531213582836,4.398853146384959e-8,pop
+reform,Non-ACSC (excluding deliveries),Pre-interruption trend (% per year),5.27224662507817,4.644416858114453,5.903843150251453,1.3521544237454063e-63,pop
+reform,Non-ACSC (excluding deliveries),Immediate level change (%),13.565144991572575,7.205313637294664,20.302265992068016,1.5173235764133267e-5,pop
+reform,Non-ACSC (excluding deliveries),Change in trend after interruption (% per year),-4.685231780184395,-5.491310304568831,-3.8722780934252854,1.6808587734688895e-28,pop
+reform,Non-ACSC (excluding deliveries),Post-interruption trend (% per year),0.33999787048590857,-0.29515346750109694,0.9791953229415284,0.29481155587415125,pop
+reform,ACSC share of hospitalizations,Pre-interruption trend (% per year),-1.8193299916441474,-2.2472861781557274,-1.3895002356897002,1.7519286488965748e-16,hosp
+reform,ACSC share of hospitalizations,Immediate level change (%),-4.569546208285569,-7.2135739090798845,-1.8501747015371772,0.0011037106545779222,hosp
+reform,ACSC share of hospitalizations,Change in trend after interruption (% per year),0.6973528965405151,0.17268940786139275,1.2247643575260758,0.00912543416524733,hosp
+reform,ACSC share of hospitalizations,Post-interruption trend (% per year),-1.134664245497985,-1.3935338932172914,-0.8751149923009072,1.4546174387271106e-17,hosp
+reform,01 Anemia,Pre-interruption trend (% per year),4.417998258816236,0.8714338987523051,8.08925717584168,0.014202631620620593,pop
+reform,01 Anemia,Immediate level change (%),27.691031677729082,-0.5811731521250141,64.00313791543518,0.05557958696207229,pop
+reform,01 Anemia,Change in trend after interruption (% per year),5.408881762683371,0.9618428259816403,10.051798218564588,0.016610075242858503,pop
+reform,01 Anemia,Post-interruption trend (% per year),10.065844323596407,7.509206224472664,12.683280921745821,1.2619138869700477e-15,pop
+reform,02 Angina de pecho,Pre-interruption trend (% per year),7.9411215475344354,6.7861195087027815,9.108616124870572,4.658157135920095e-44,pop
+reform,02 Angina de pecho,Immediate level change (%),-6.540899996016824,-13.625763415415904,1.1251007121892531,0.0926064764217916,pop
+reform,02 Angina de pecho,Change in trend after interruption (% per year),-6.883825069365557,-8.314113838632997,-5.431223967751874,1.7069690162937431e-19,pop
+reform,02 Angina de pecho,Post-interruption trend (% per year),0.5106435622909133,-0.6137603564691618,1.6477683987258906,0.3748755400415926,pop
+reform,03 Asma,Pre-interruption trend (% per year),-1.136128996396657,-3.4606367595017784,1.2443490586118378,0.34657693526526323,pop
+reform,03 Asma,Immediate level change (%),12.493876405906267,2.8725393910823627,23.01506605876902,0.009857316974259369,pop
+reform,03 Asma,Change in trend after interruption (% per year),-4.112044068264509,-6.464133924806159,-1.7008076305729092,9.205240639656968e-4,pop
+reform,03 Asma,Post-interruption trend (% per year),-5.2014549396569905,-5.879004651798303,-4.519027743902971,2.9921590794799236e-48,pop
+reform,04 Deficiencias nutricionales,Pre-interruption trend (% per year),-8.664438485981785,-9.924216446248856,-7.387041578129006,1.8768932974145527e-37,pop
+reform,04 Deficiencias nutricionales,Immediate level change (%),19.061007784343765,1.3030535161076662,39.93184886938861,0.03425457267173118,pop
+reform,04 Deficiencias nutricionales,Change in trend after interruption (% per year),3.770156566834859,1.6148257214096073,5.971203684666815,5.485544194122259e-4,pop
+reform,04 Deficiencias nutricionales,Post-interruption trend (% per year),-5.220944815705542,-6.787416542738722,-3.6281479555134943,2.8604556170232806e-10,pop
+reform,05 Diabetes mellitus,Pre-interruption trend (% per year),5.549534358186703,4.823915421055003,6.28017622200272,3.8102131404996055e-53,pop
+reform,05 Diabetes mellitus,Immediate level change (%),31.71955152297383,18.518580240921988,46.39088840032146,3.1676966465842893e-7,pop
+reform,05 Diabetes mellitus,Change in trend after interruption (% per year),-6.66122113784795,-8.077293077806747,-5.223334568987559,9.758448308603815e-19,pop
+reform,05 Diabetes mellitus,Post-interruption trend (% per year),-1.4813535353809137,-2.7358965755230447,-0.2106290039778247,0.022464271979626676,pop
+reform,06 Enfermedad inflamatoria de órganos pélvicos femeninos,Pre-interruption trend (% per year),-6.6112160542271425,-11.906600347045748,-0.9975207991900437,0.021643021987936176,pop
+reform,06 Enfermedad inflamatoria de órganos pélvicos femeninos,Immediate level change (%),50.00034367499349,14.817625414566438,95.96384284534822,0.0029475834996453413,pop
+reform,06 Enfermedad inflamatoria de órganos pélvicos femeninos,Change in trend after interruption (% per year),6.706091999350217,0.7134276022187525,13.055332748132532,0.027734049569283797,pop
+reform,06 Enfermedad inflamatoria de órganos pélvicos femeninos,Post-interruption trend (% per year),-0.3484782857491986,-1.000336709462013,0.3076722677592292,0.2971667058768751,pop
+reform,07 Enfermedades cerebrovasculares,Pre-interruption trend (% per year),4.662957500263443,3.9079774052186877,5.423423169738051,5.620312516466888e-35,pop
+reform,07 Enfermedades cerebrovasculares,Immediate level change (%),1.98122512004959,-1.92616084664875,6.044286292537326,0.32500661766814654,pop
+reform,07 Enfermedades cerebrovasculares,Change in trend after interruption (% per year),-4.387925972914886,-5.192085784397571,-3.5769452856882933,2.1759103806985737e-25,pop
+reform,07 Enfermedades cerebrovasculares,Post-interruption trend (% per year),0.07042440408850936,-0.38023494634438215,0.5231224448357441,0.7598327715651781,pop
+reform,08 Enfermedades de vías aéreas inferiores,Pre-interruption trend (% per year),5.4997588613791,4.3738079811255215,6.637856135534226,1.3784024281924036e-22,pop
+reform,08 Enfermedades de vías aéreas inferiores,Immediate level change (%),22.40785793257427,8.728403580879117,37.80836644488639,8.25808978036733e-4,pop
+reform,08 Enfermedades de vías aéreas inferiores,Change in trend after interruption (% per year),-5.135694177361982,-6.668859381466796,-3.577343429316515,2.2680464083889964e-10,pop
+reform,08 Enfermedades de vías aéreas inferiores,Post-interruption trend (% per year),0.08161388840433048,-1.227232188583205,1.4078035924988352,0.9033240275826055,pop
+reform,09 Enfermedades prevenibles por inmunización,Pre-interruption trend (% per year),-11.630533423824707,-14.580896655875197,-8.578265080853454,9.563748050548232e-13,pop
+reform,09 Enfermedades prevenibles por inmunización,Immediate level change (%),25.293153729473428,-0.553663755887801,57.85774483378114,0.05576539512525699,pop
+reform,09 Enfermedades prevenibles por inmunización,Change in trend after interruption (% per year),14.4271164747914,10.031358103084198,18.998485617787363,1.5518152386847064e-11,pop
+reform,09 Enfermedades prevenibles por inmunización,Post-interruption trend (% per year),1.11863244727195,-0.8941260706770371,3.1722684298046033,0.2781774194506999,pop
+reform,10 Enfermedades relacionadas con la atención prenatal y del parto,Pre-interruption trend (% per year),8.66138714693454,5.937084984392316,11.455748083266194,1.4365656266048083e-10,pop
+reform,10 Enfermedades relacionadas con la atención prenatal y del parto,Immediate level change (%),6.920234833491157,-4.174791287241153,19.299887476548427,0.23128239451742086,pop
+reform,10 Enfermedades relacionadas con la atención prenatal y del parto,Change in trend after interruption (% per year),-4.944182772609729,-7.360780144344026,-2.464545763169357,1.1374250323255138e-4,pop
+reform,10 Enfermedades relacionadas con la atención prenatal y del parto,Post-interruption trend (% per year),3.2889695631370452,2.7839618564233337,3.796458520614343,2.6557952363436133e-38,pop
+reform,11 Epilepsia,Pre-interruption trend (% per year),4.30091371573984,2.7744887212090896,5.850009445906634,2.1659765285976976e-8,pop
+reform,11 Epilepsia,Immediate level change (%),11.803148465431047,-0.8088741870710514,26.018773396701643,0.06770415847089152,pop
+reform,11 Epilepsia,Change in trend after interruption (% per year),1.4074883389728843,-0.5404116302224815,3.3935376143556795,0.15783686974609476,pop
+reform,11 Epilepsia,Post-interruption trend (% per year),5.76893691373106,4.382409802623566,7.173881471163757,8.044511622283868e-17,pop
+reform,12 Gastroenteritis infecciosas y complicaciones,Pre-interruption trend (% per year),5.214942603863704,3.7162920396165644,6.735247948372924,3.78226934240715e-12,pop
+reform,12 Gastroenteritis infecciosas y complicaciones,Immediate level change (%),-5.020488556133884,-11.519025277010842,1.9553369790311192,0.15431708723525409,pop
+reform,12 Gastroenteritis infecciosas y complicaciones,Change in trend after interruption (% per year),-10.657125006213974,-12.099042093922673,-9.191554878341035,5.6830057962279624e-42,pop
+reform,12 Gastroenteritis infecciosas y complicaciones,Post-interruption trend (% per year),-5.997945354646339,-6.729260145134153,-5.260896490175416,2.458233062258208e-54,pop
+reform,13 Hipertensión arterial,Pre-interruption trend (% per year),2.3663108307914404,1.1282158932361286,3.619563546627158,1.6522519583866876e-4,pop
+reform,13 Hipertensión arterial,Immediate level change (%),25.607534157837875,10.877278512463139,42.294732057650286,3.405155665221981e-4,pop
+reform,13 Hipertensión arterial,Change in trend after interruption (% per year),-7.84992495415292,-9.375342876587023,-6.2988307984293,8.061900333074147e-22,pop
+reform,13 Hipertensión arterial,Post-interruption trend (% per year),-5.66936774776059,-6.888479772915302,-4.434293851010917,1.4443756367185591e-18,pop
+reform,"14 Infecciones de garganta, nariz y oídos",Pre-interruption trend (% per year),4.053545308457296,3.021195449183156,5.096240089737991,5.684865241658359e-15,pop
+reform,"14 Infecciones de garganta, nariz y oídos",Immediate level change (%),15.39601335770433,3.715780154100945,28.39164762648658,0.008537486570193532,pop
+reform,"14 Infecciones de garganta, nariz y oídos",Change in trend after interruption (% per year),-4.291994625380935,-5.759238016489254,-2.801907582296126,2.615977787636407e-8,pop
+reform,"14 Infecciones de garganta, nariz y oídos",Post-interruption trend (% per year),-0.41242726369999927,-1.6801634030667145,0.8716550675917922,0.527222594025116,pop
+reform,15 Infecciones de la piel y tejido celular subcutáneo,Pre-interruption trend (% per year),3.3270089167910744,2.2634028856738375,4.401677143742844,5.660545983880286e-10,pop
+reform,15 Infecciones de la piel y tejido celular subcutáneo,Immediate level change (%),11.585979862280183,5.900355026581217,17.576857024698956,3.982352229523092e-5,pop
+reform,15 Infecciones de la piel y tejido celular subcutáneo,Change in trend after interruption (% per year),-0.7408177974227881,-1.9255456701717466,0.45822144868084,0.2248525906224824,pop
+reform,15 Infecciones de la piel y tejido celular subcutáneo,Post-interruption trend (% per year),2.5615440451908444,1.9215211271794042,3.2055860293528804,2.392131767727082e-15,pop
+reform,16 Infecciones renales y de vías urinarias,Pre-interruption trend (% per year),5.680186370543572,3.3248544761687038,8.089209009132725,1.554243168140013e-6,pop
+reform,16 Infecciones renales y de vías urinarias,Immediate level change (%),22.84742086864624,10.09555698380633,37.07627471559154,2.3323346631328528e-4,pop
+reform,16 Infecciones renales y de vías urinarias,Change in trend after interruption (% per year),-4.224990537150164,-6.423594389138665,-1.974729872032066,2.692426545548639e-4,pop
+reform,16 Infecciones renales y de vías urinarias,Post-interruption trend (% per year),1.2152084967454568,0.3806984655316592,2.056656186322292,0.004243012005927413,pop
+reform,17 Insuficiencia cardíaca,Pre-interruption trend (% per year),0.3136251875863971,-0.5349596571409654,1.1694497241312884,0.4700257091699413,pop
+reform,17 Insuficiencia cardíaca,Immediate level change (%),9.300991690424642,1.3020044106007544,17.93159329885985,0.021814980431363394,pop
+reform,17 Insuficiencia cardíaca,Change in trend after interruption (% per year),-1.899472398891755,-3.136599940933138,-0.6465444146364407,0.003059345323541481,pop
+reform,17 Insuficiencia cardíaca,Post-interruption trend (% per year),-1.5918044351795335,-2.451531574648902,-0.7245002341091933,3.3819962962770297e-4,pop
+reform,18 Neumonías bacterianas,Pre-interruption trend (% per year),6.571844956082029,3.7768539889034836,9.44211257895342,2.678909378843362e-6,pop
+reform,18 Neumonías bacterianas,Immediate level change (%),-21.297276380316422,-40.04413193011666,3.311300537531414,0.08447615372830754,pop
+reform,18 Neumonías bacterianas,Change in trend after interruption (% per year),7.979045599055556,3.783819080141493,12.34385467622381,1.465113447475172e-4,pop
+reform,18 Neumonías bacterianas,Post-interruption trend (% per year),15.075261060882594,11.828009082472168,18.41680645914201,6.939164530187993e-22,pop
+reform,19 Úlcera gastrointestinal,Pre-interruption trend (% per year),3.225638390755803,1.7492445869377482,4.723454846631903,1.5652981429672135e-5,pop
+reform,19 Úlcera gastrointestinal,Immediate level change (%),3.519903766940602,-5.924947466977937,13.912989547946308,0.478508110816623,pop
+reform,19 Úlcera gastrointestinal,Change in trend after interruption (% per year),-2.3103425451215354,-4.042154947583665,-0.547275020207616,0.010428247248236128,pop
+reform,19 Úlcera gastrointestinal,Post-interruption trend (% per year),0.8407725495408691,-0.23242969192053264,1.925519254273489,0.12510336313873055,pop
+reform,20 Otras condiciones evitables,Pre-interruption trend (% per year),-16.97652670597265,-17.942668056831067,-15.99901002657582,4.708863320218264e-213,pop
+reform,20 Otras condiciones evitables,Immediate level change (%),-13.145076619997587,-20.62763447160716,-4.957126260177381,0.0021688621782642867,pop
+reform,20 Otras condiciones evitables,Change in trend after interruption (% per year),13.974502367892129,11.960417640873455,16.024818982689414,6.988377339036556e-47,pop
+reform,20 Otras condiciones evitables,Post-interruption trend (% per year),-5.3744094645925,-6.6439982456688025,-4.087554994725506,1.0961822961424853e-15,pop
+covid,All ACSC,Pre-interruption trend (% per year),-1.7237088126492384,-2.2729534196654133,-1.1713773463766786,1.1971021659970252e-9,pop
+covid,All ACSC,Immediate level change (%),-44.046675885110645,-54.87840582909016,-30.614719248454925,1.2269726288357972e-7,pop
+covid,All ACSC,Change in trend after interruption (% per year),16.547771494910336,9.20772893295323,24.381151161647097,3.951853913409867e-6,pop
+covid,All ACSC,Post-interruption trend (% per year),14.538827286706258,7.27820322434507,22.290852772567217,4.8530277898384864e-5,pop
+covid,Chronic,Pre-interruption trend (% per year),-3.4403580957016233,-4.202239737576408,-2.672417192789467,4.633404688513444e-18,pop
+covid,Chronic,Immediate level change (%),-33.75259713137688,-47.757161186469475,-15.993876165454335,6.78184269705763e-4,pop
+covid,Chronic,Change in trend after interruption (% per year),16.409491415225585,8.790929339315623,24.561576721950672,1.0835667167349705e-5,pop
+covid,Chronic,Post-interruption trend (% per year),12.404588053156784,4.953753940763583,20.384368743313487,8.327904439850491e-4,pop
+covid,Infectious,Pre-interruption trend (% per year),-2.3550552090756294,-3.2528965781984165,-1.448881609885,4.267652636886925e-7,pop
+covid,Infectious,Immediate level change (%),-48.67440339431893,-59.15968418058686,-35.497147510380024,1.0618342816022725e-8,pop
+covid,Infectious,Change in trend after interruption (% per year),18.279684871318793,10.538006239593777,26.563562426977704,1.168942023716185e-6,pop
+covid,Infectious,Post-interruption trend (% per year),15.494132991478548,7.932641993873313,23.585363139822935,3.0516708024947516e-5,pop
+covid,Vaccine-preventable,Pre-interruption trend (% per year),7.530972213749587,5.557243446295712,9.541606124993574,1.5679272927890077e-14,pop
+covid,Vaccine-preventable,Immediate level change (%),-69.57620389726893,-79.97512872534988,-53.77711264130326,2.4581611218838817e-8,pop
+covid,Vaccine-preventable,Change in trend after interruption (% per year),20.276620409751757,6.898240122647703,35.329313191626795,0.002149622871100679,pop
+covid,Vaccine-preventable,Post-interruption trend (% per year),29.334619272447227,14.893837534963916,45.59043462412391,2.0592531103051764e-5,pop
+covid,Other acute,Pre-interruption trend (% per year),1.5558187172476146,1.174736904970275,1.9383359011611256,8.374010989139064e-16,pop
+covid,Other acute,Immediate level change (%),-29.325177692003557,-39.52359859195121,-17.406948959067904,1.2696975515403687e-5,pop
+covid,Other acute,Change in trend after interruption (% per year),7.660709009847655,2.5824391850300055,12.990374927588544,0.0027516150444764857,pop
+covid,Other acute,Post-interruption trend (% per year),9.33571447174435,4.170625712462783,14.756903659614062,3.005365017216084e-4,pop
+covid,Non-ACSC (excluding deliveries),Pre-interruption trend (% per year),-0.951308166721121,-1.5584880160891212,-0.3403832776635807,0.002313121264527576,pop
+covid,Non-ACSC (excluding deliveries),Immediate level change (%),-18.548339969655014,-30.01094447372491,-5.20842334830135,0.008021038168587754,pop
+covid,Non-ACSC (excluding deliveries),Change in trend after interruption (% per year),7.675660368983661,3.1360694929784216,12.415063836479167,7.653945032979778e-4,pop
+covid,Non-ACSC (excluding deliveries),Post-interruption trend (% per year),6.651333018322636,2.039734610860333,11.471348665919967,0.004299749356395778,pop
+covid,ACSC share of hospitalizations,Pre-interruption trend (% per year),-0.6441606917320541,-0.8789526597299147,-0.40881256265928867,8.624813943577215e-8,hosp
+covid,ACSC share of hospitalizations,Immediate level change (%),-28.16287420583481,-35.66676930326196,-19.783716961250384,4.1973441573069e-9,hosp
+covid,ACSC share of hospitalizations,Change in trend after interruption (% per year),7.448567377600668,4.049647888954411,10.958517070814544,1.1839692547988518e-5,hosp
+covid,ACSC share of hospitalizations,Post-interruption trend (% per year),6.75642594272492,3.387615623811535,10.235006497622013,6.432522417633019e-5,hosp
+covid,01 Anemia,Pre-interruption trend (% per year),6.166049949839558,2.4237946423729007,10.045035934344316,0.0010831434152599126,pop
+covid,01 Anemia,Immediate level change (%),-46.06689061859708,-53.48765672903083,-37.46218566971454,2.956575688415989e-16,pop
+covid,01 Anemia,Change in trend after interruption (% per year),5.803662159825063,-0.44398416793410833,12.443380069703448,0.06926706167756509,pop
+covid,01 Anemia,Post-interruption trend (% per year),12.327568817359392,7.454136175697368,17.422029206841017,2.794462925002201e-7,pop
+covid,02 Angina de pecho,Pre-interruption trend (% per year),0.19687859200618885,-2.0606390407739816,2.506432360333899,0.8656690397222624,pop
+covid,02 Angina de pecho,Immediate level change (%),4.8663498396918525,-29.68343640514576,56.39204714357506,0.8157510266414194,pop
+covid,02 Angina de pecho,Change in trend after interruption (% per year),10.92874084103277,0.23361855085346495,22.76505350681304,0.04495508533823261,pop
+covid,02 Angina de pecho,Post-interruption trend (% per year),11.147135784130779,0.2471017412488674,23.232348650861923,0.04476799945577678,pop
+covid,03 Asma,Pre-interruption trend (% per year),-5.726878353055387,-7.151096518481581,-4.280813969669994,3.1233885445722496e-14,pop
+covid,03 Asma,Immediate level change (%),-44.21477389516964,-69.17194534927827,0.9467346164248047,0.05375266237605437,pop
+covid,03 Asma,Change in trend after interruption (% per year),25.603963382866702,7.695554964340423,46.49031357615734,0.0036773074037640173,pop
+covid,03 Asma,Post-interruption trend (% per year),18.410777193313677,1.270395848734207,38.45223017067754,0.03415824356715111,pop
+covid,04 Deficiencias nutricionales,Pre-interruption trend (% per year),-5.174973285498552,-6.869872033885283,-3.4492286462060484,7.719440915267538e-9,pop
+covid,04 Deficiencias nutricionales,Immediate level change (%),-38.53532430555515,-48.77898928686011,-26.243033754620527,1.6734457110027062e-7,pop
+covid,04 Deficiencias nutricionales,Change in trend after interruption (% per year),15.50477852319001,9.021956274463427,22.373091784413003,1.0036322349827849e-6,pop
+covid,04 Deficiencias nutricionales,Post-interruption trend (% per year),9.527437091140655,3.8121709447267005,15.557350998285258,8.739813244185586e-4,pop
+covid,05 Diabetes mellitus,Pre-interruption trend (% per year),-3.638756986299374,-4.306465470148845,-2.9663895187307165,1.4970853427821042e-25,pop
+covid,05 Diabetes mellitus,Immediate level change (%),-23.297029423092418,-36.572851955013604,-7.242468301599736,0.006232226269208305,pop
+covid,05 Diabetes mellitus,Change in trend after interruption (% per year),11.427640692725284,5.667672730593476,17.50158576883567,6.449855435370878e-5,pop
+covid,05 Diabetes mellitus,Post-interruption trend (% per year),7.3730596323501985,1.706717968800131,13.3550876978342,0.010118460481737817,pop
+covid,06 Enfermedad inflamatoria de órganos pélvicos femeninos,Pre-interruption trend (% per year),-1.0725238776903456,-1.9320907532031861,-0.2054228840429051,0.015443883896709022,pop
+covid,06 Enfermedad inflamatoria de órganos pélvicos femeninos,Immediate level change (%),-45.69254394116873,-56.80924487460535,-31.714558473931277,1.7470334448266e-7,pop
+covid,06 Enfermedad inflamatoria de órganos pélvicos femeninos,Change in trend after interruption (% per year),12.761665705690284,5.030999812681358,21.061336894810978,9.178327305171869e-4,pop
+covid,06 Enfermedad inflamatoria de órganos pélvicos femeninos,Post-interruption trend (% per year),11.552269916115376,4.045701753988085,19.600413219000522,0.0020994095771228473,pop
+covid,07 Enfermedades cerebrovasculares,Pre-interruption trend (% per year),0.229696171896987,-0.7226892899383275,1.191218042257347,0.6376448083866189,pop
+covid,07 Enfermedades cerebrovasculares,Immediate level change (%),-26.918043052897943,-38.32467043547273,-13.401801515626543,2.9247966218721555e-4,pop
+covid,07 Enfermedades cerebrovasculares,Change in trend after interruption (% per year),10.419197239387735,5.215384688537772,15.88038341620075,5.7202649774071665e-5,pop
+covid,07 Enfermedades cerebrovasculares,Post-interruption trend (% per year),10.672825908485994,5.406654927836074,16.20209751420012,4.565216709189284e-5,pop
+covid,08 Enfermedades de vías aéreas inferiores,Pre-interruption trend (% per year),-2.836769468998024,-3.8478553122065384,-1.815051573996429,6.967437836347122e-8,pop
+covid,08 Enfermedades de vías aéreas inferiores,Immediate level change (%),-65.98896578446706,-79.62825777149021,-43.217892930566016,3.720567607262599e-5,pop
+covid,08 Enfermedades de vías aéreas inferiores,Change in trend after interruption (% per year),31.037689118295432,13.62013992886284,51.12528448049496,2.034385287978708e-4,pop
+covid,08 Enfermedades de vías aéreas inferiores,Post-interruption trend (% per year),27.320451960507075,10.340181613062471,46.913819158593206,9.419960931859017e-4,pop
+covid,09 Enfermedades prevenibles por inmunización,Pre-interruption trend (% per year),0.14178148766941234,-4.922299113356621,5.475587924454417,0.957323591341549,pop
+covid,09 Enfermedades prevenibles por inmunización,Immediate level change (%),-61.75820333533124,-70.84545901568747,-49.838516993672556,3.815181866230956e-12,pop
+covid,09 Enfermedades prevenibles por inmunización,Change in trend after interruption (% per year),14.277265338916155,5.012848513614987,24.359005190187766,0.001975579658024944,pop
+covid,09 Enfermedades prevenibles por inmunización,Post-interruption trend (% per year),14.439289345781603,7.50664390460416,21.818991555429367,2.3355230264676588e-5,pop
+covid,10 Enfermedades relacionadas con la atención prenatal y del parto,Pre-interruption trend (% per year),3.2760960009077467,2.4372046383998036,4.121857315798461,9.439740816840216e-15,pop
+covid,10 Enfermedades relacionadas con la atención prenatal y del parto,Immediate level change (%),-38.487540162383915,-45.06365992728786,-31.12423014954715,3.652433496601443e-17,pop
+covid,10 Enfermedades relacionadas con la atención prenatal y del parto,Change in trend after interruption (% per year),2.841837735923547,0.06752794520001881,5.693063534996146,0.04460664154162931,pop
+covid,10 Enfermedades relacionadas con la atención prenatal y del parto,Post-interruption trend (% per year),6.211035069250159,3.324458317560297,9.178254153637177,1.8170586353079453e-5,pop
+covid,11 Epilepsia,Pre-interruption trend (% per year),3.2380760451189206,1.8138580809714977,4.682216609663126,6.917322656234472e-6,pop
+covid,11 Epilepsia,Immediate level change (%),-30.387877213964664,-42.49636598068053,-15.729714801154959,2.0295535093342823e-4,pop
+covid,11 Epilepsia,Change in trend after interruption (% per year),4.850385190612427,-1.3044528094725893,11.389050342840012,0.12489348529704876,pop
+covid,11 Epilepsia,Post-interruption trend (% per year),8.24552039668458,2.3172122205223022,14.517317581869182,0.005831534428414824,pop
+covid,12 Gastroenteritis infecciosas y complicaciones,Pre-interruption trend (% per year),-6.388188618712998,-7.505293660847823,-5.257591737698375,4.401510401589696e-27,pop
+covid,12 Gastroenteritis infecciosas y complicaciones,Immediate level change (%),-53.422037952516234,-66.35888559030627,-35.51026514532787,4.178111207898235e-6,pop
+covid,12 Gastroenteritis infecciosas y complicaciones,Change in trend after interruption (% per year),25.900045573798103,14.153344335849184,38.855515514726655,4.04932432356883e-6,pop
+covid,12 Gastroenteritis infecciosas y complicaciones,Post-interruption trend (% per year),17.857313191498257,6.889829604657649,29.950120830893766,9.774809694524395e-4,pop
+covid,13 Hipertensión arterial,Pre-interruption trend (% per year),-8.793964495374862,-9.72256926945615,-7.855807978189366,1.4624752792503368e-69,pop
+covid,13 Hipertensión arterial,Immediate level change (%),-21.361760261455164,-35.81601909285025,-3.652396411454273,0.020394001965313525,pop
+covid,13 Hipertensión arterial,Change in trend after interruption (% per year),18.86006542372025,12.707430450712277,25.34856926499809,1.876223314530184e-10,pop
+covid,13 Hipertensión arterial,Post-interruption trend (% per year),8.407553471178964,2.763599946054085,14.361482623962797,0.003083471767018655,pop
+covid,"14 Infecciones de garganta, nariz y oídos",Pre-interruption trend (% per year),-2.875300221291255,-5.203818625197432,-0.48958544218625777,0.01845484810793915,pop
+covid,"14 Infecciones de garganta, nariz y oídos",Immediate level change (%),-65.52277845653724,-81.72089078457549,-34.970638265350075,0.0010048363375802826,pop
+covid,"14 Infecciones de garganta, nariz y oídos",Change in trend after interruption (% per year),33.70568250816519,12.225621197763491,59.29704237030804,0.0011507895835657985,pop
+covid,"14 Infecciones de garganta, nariz y oídos",Post-interruption trend (% per year),29.86124272312893,9.066173546019996,54.62119751069967,0.003339205796287633,pop
+covid,15 Infecciones de la piel y tejido celular subcutáneo,Pre-interruption trend (% per year),2.078183333062067,1.1855054005347476,2.978736641494928,4.437544630656103e-6,pop
+covid,15 Infecciones de la piel y tejido celular subcutáneo,Immediate level change (%),-49.69648121418248,-57.86198927416011,-39.948660161041325,2.89322297515214e-14,pop
+covid,15 Infecciones de la piel y tejido celular subcutáneo,Change in trend after interruption (% per year),16.671208110120283,10.750097603063647,22.90888312046462,6.539661066711872e-9,pop
+covid,15 Infecciones de la piel y tejido celular subcutáneo,Post-interruption trend (% per year),19.095849711546965,13.07727010580928,25.434770447174927,3.9735176377310104e-11,pop
+covid,16 Infecciones renales y de vías urinarias,Pre-interruption trend (% per year),-0.7398801821711487,-2.084596656258697,0.6233038908225241,0.28592499795063625,pop
+covid,16 Infecciones renales y de vías urinarias,Immediate level change (%),-46.300199554357945,-57.57633427217061,-32.026888331572714,2.3385575207538358e-7,pop
+covid,16 Infecciones renales y de vías urinarias,Change in trend after interruption (% per year),15.389041371893564,7.818442836236361,23.491218371127243,3.5623570100066934e-5,pop
+covid,16 Infecciones renales y de vías urinarias,Post-interruption trend (% per year),14.535300722385669,7.141300848909626,22.439572859645974,6.724539551581399e-5,pop
+covid,17 Insuficiencia cardíaca,Pre-interruption trend (% per year),-1.5026720088594736,-3.285905876833617,0.3134414828832588,0.1043241514766136,pop
+covid,17 Insuficiencia cardíaca,Immediate level change (%),-28.928534986945586,-44.3615725408109,-9.214667456105785,0.006258451778391236,pop
+covid,17 Insuficiencia cardíaca,Change in trend after interruption (% per year),15.255259737671922,8.342184277866792,22.609443272152685,6.8328030788618725e-6,pop
+covid,17 Insuficiencia cardíaca,Post-interruption trend (% per year),13.523351210855662,6.593994178389773,20.903165037379058,7.90782762773963e-5,pop
+covid,18 Neumonías bacterianas,Pre-interruption trend (% per year),11.13449135735134,7.234906555375309,15.1758841033661,6.921655419034688e-9,pop
+covid,18 Neumonías bacterianas,Immediate level change (%),-77.24143489679945,-87.51385957979265,-58.51782311222662,1.3467427968662434e-6,pop
+covid,18 Neumonías bacterianas,Change in trend after interruption (% per year),23.66136445494189,5.587223497426463,44.829388938621804,0.008430118497938123,pop
+covid,18 Neumonías bacterianas,Post-interruption trend (% per year),37.430428392560145,17.3477030837033,60.95008382644309,7.990809439941257e-5,pop
+covid,19 Úlcera gastrointestinal,Pre-interruption trend (% per year),2.034214558158043,0.7023582817608398,3.3836855277088462,0.0026643615202139297,pop
+covid,19 Úlcera gastrointestinal,Immediate level change (%),-17.844910450716323,-29.206054505678946,-4.660508865235546,0.00964080564070873,pop
+covid,19 Úlcera gastrointestinal,Change in trend after interruption (% per year),6.614104211344607,2.4761843956448315,10.919110462806403,0.0015189063960601562,pop
+covid,19 Úlcera gastrointestinal,Post-interruption trend (% per year),8.782863840261545,4.468653108676479,13.275237242491599,4.555320446021674e-5,pop
+covid,20 Otras condiciones evitables,Pre-interruption trend (% per year),-2.4761160394408455,-4.376543418047618,-0.5379194319183322,0.012519390171346411,pop
+covid,20 Otras condiciones evitables,Immediate level change (%),-25.787543849404315,-41.620180379063164,-5.661088306464568,0.014852514520477967,pop
+covid,20 Otras condiciones evitables,Change in trend after interruption (% per year),12.19316493912228,4.512602005845867,20.438167431263764,0.0014734878737804268,pop
+covid,20 Otras condiciones evitables,Post-interruption trend (% per year),9.415131986908353,2.1145792366203287,17.237628526792136,0.01065264791473816,pop

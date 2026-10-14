@@ -1,0 +1,2 @@
+statistic,value,p_value,nsim,neighbours
+Global Moran's I,0.2607257416778384,0.01,999,queen

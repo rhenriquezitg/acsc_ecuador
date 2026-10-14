@@ -1,0 +1,21 @@
+group,name,category,icd10
+1,Anemia,Other acute,D50
+2,Angina de pecho,Chronic,I20
+3,Asma,Chronic,J45-J46
+4,Deficiencias nutricionales,Other acute,"E40-E46, E50-E64"
+5,Diabetes mellitus,Chronic,E10-E14
+6,Enfermedad inflamatoria de órganos pélvicos femeninos,Other acute,"N70-N73, N75-N76"
+7,Enfermedades cerebrovasculares,Chronic,"I63-I67, I69, G45-G46"
+8,Enfermedades de vías aéreas inferiores,Chronic,"J20-J21, J40-J44, J47"
+9,Enfermedades prevenibles por inmunización,Vaccine-preventable,"A17.0, A19, A33-A37, A95, B05-B06, B16, B26, G00.0"
+10,Enfermedades relacionadas con la atención prenatal y del parto,Infectious,"A50, O23, P35.0"
+11,Epilepsia,Other acute,G40-G41
+12,Gastroenteritis infecciosas y complicaciones,Infectious,"A00-A09, E86"
+13,Hipertensión arterial,Chronic,I10-I11
+14,"Infecciones de garganta, nariz y oídos",Infectious,"H66, J00-J03, J06, J31"
+15,Infecciones de la piel y tejido celular subcutáneo,Infectious,"A46, L01-L04, L08"
+16,Infecciones renales y de vías urinarias,Infectious,"N10-N12, N30, N34, N39.0"
+17,Insuficiencia cardíaca,Chronic,"I50, J81"
+18,Neumonías bacterianas,Vaccine-preventable,"J13-J14, J15.3-J15.4, J15.8-J15.9, J18.1"
+19,Úlcera gastrointestinal,Other acute,"K25-K28, K92.0-K92.2"
+20,Otras condiciones evitables,Vaccine-preventable,"A15-A16, A17.1-A17.9, A18, A51-A53, B50-B54, B77, I00-I02"

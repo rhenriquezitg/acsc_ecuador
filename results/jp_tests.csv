@@ -1,0 +1,113 @@
+series,H0,H1,stat,p,level,decision
+Total,0,4,3.122023057561687,0.0015555555555555555,0.0125,reject H0
+Total,1,4,1.2131506590222334,0.08066666666666666,0.0125,keep H0
+Total,1,3,1.1252591828953817,0.05466666666666667,0.0125,keep H0
+Total,1,2,0.5601350843567376,0.082,0.0125,keep H0
+Hombre,0,4,2.3031861632032298,0.01,0.0125,reject H0
+Hombre,1,4,1.123219732592381,0.09888888888888889,0.0125,keep H0
+Hombre,1,3,1.0821963620801196,0.06155555555555556,0.0125,keep H0
+Hombre,1,2,0.7366717290182864,0.035777777777777776,0.0125,keep H0
+Mujer,0,4,3.848680615093961,8.888888888888889e-4,0.0125,reject H0
+Mujer,1,4,1.274572849038365,0.0651111111111111,0.0125,keep H0
+Mujer,1,3,1.135932943562722,0.050444444444444445,0.0125,keep H0
+Mujer,1,2,0.489116214431171,0.10377777777777777,0.0125,keep H0
+Chronic,0,4,5.114775663597014,2.2222222222222223e-4,0.0125,reject H0
+Chronic,1,4,1.1352115719853082,0.09377777777777778,0.0125,keep H0
+Chronic,1,3,1.1223746721798864,0.05511111111111111,0.0125,keep H0
+Chronic,1,2,0.8175913440009616,0.027555555555555555,0.0125,keep H0
+Infectious,0,4,4.229922087766171,8.888888888888889e-4,0.0125,reject H0
+Infectious,1,4,1.3347108526343145,0.048666666666666664,0.0125,keep H0
+Infectious,1,3,1.1351308822249697,0.03822222222222222,0.0125,keep H0
+Infectious,1,2,0.3381651133891638,0.18888888888888888,0.0125,keep H0
+Vaccine-preventable,0,4,6.334120361331767,2.2222222222222223e-4,0.0125,reject H0
+Vaccine-preventable,1,4,2.0229531355889923,0.004222222222222222,0.0125,reject H0
+Vaccine-preventable,2,4,1.3883126769893412,0.012444444444444444,0.0125,reject H0
+Vaccine-preventable,3,4,0.03588023981214372,0.9166666666666666,0.0125,keep H0
+Other acute,0,4,1.5989255883750138,0.030222222222222223,0.0125,keep H0
+Other acute,0,3,1.300086474094533,0.029333333333333333,0.0125,keep H0
+Other acute,0,2,0.7002981026250854,0.07266666666666667,0.0125,keep H0
+Other acute,0,1,0.22226328030320391,0.1817777777777778,0.0125,keep H0
+01 Anemia,0,4,4.814802741091628,0.001,0.0125,reject H0
+01 Anemia,1,4,0.9754264053988908,0.061,0.0125,keep H0
+01 Anemia,1,3,0.7555581936801004,0.047,0.0125,keep H0
+01 Anemia,1,2,0.2654937560019635,0.163,0.0125,keep H0
+02 Angina de pecho,0,4,2.2574007437824273,0.003,0.0125,reject H0
+02 Angina de pecho,1,4,1.4222619839751578,0.009,0.0125,reject H0
+02 Angina de pecho,2,4,0.449643653308373,0.238,0.0125,keep H0
+02 Angina de pecho,2,3,0.4090056347980355,0.109,0.0125,keep H0
+03 Asma,0,4,0.9668971912191543,0.177,0.0125,keep H0
+03 Asma,0,3,0.8098402538291603,0.176,0.0125,keep H0
+03 Asma,0,2,0.702928740293305,0.092,0.0125,keep H0
+03 Asma,0,1,0.165264308796704,0.294,0.0125,keep H0
+04 Deficiencias nutricionales,0,4,1.5261197628638987,0.036,0.0125,keep H0
+04 Deficiencias nutricionales,0,3,1.2095548045553155,0.038,0.0125,keep H0
+04 Deficiencias nutricionales,0,2,0.4356607909070217,0.231,0.0125,keep H0
+04 Deficiencias nutricionales,0,1,0.05908139483411608,0.702,0.0125,keep H0
+05 Diabetes mellitus,0,4,16.940607236540064,0.001,0.0125,reject H0
+05 Diabetes mellitus,1,4,1.326941950428985,0.067,0.0125,keep H0
+05 Diabetes mellitus,1,3,1.1349929115902815,0.046,0.0125,keep H0
+05 Diabetes mellitus,1,2,0.842634729304744,0.03,0.0125,keep H0
+06 Enfermedad inflamatoria de órganos pélvicos femeninos,0,4,5.38455356824901,0.001,0.0125,reject H0
+06 Enfermedad inflamatoria de órganos pélvicos femeninos,1,4,4.024272342173711,0.001,0.0125,reject H0
+06 Enfermedad inflamatoria de órganos pélvicos femeninos,2,4,0.9016846482729874,0.06,0.0125,keep H0
+06 Enfermedad inflamatoria de órganos pélvicos femeninos,2,3,0.10016238056286712,0.704,0.0125,keep H0
+07 Enfermedades cerebrovasculares,0,4,2.2991961414342788,0.005,0.0125,reject H0
+07 Enfermedades cerebrovasculares,1,4,0.828991505836862,0.202,0.0125,keep H0
+07 Enfermedades cerebrovasculares,1,3,0.8175482346064324,0.099,0.0125,keep H0
+07 Enfermedades cerebrovasculares,1,2,0.5340018844036466,0.08,0.0125,keep H0
+08 Enfermedades de vías aéreas inferiores,0,4,3.05376307282548,0.002,0.0125,reject H0
+08 Enfermedades de vías aéreas inferiores,1,4,0.9073286017793847,0.172,0.0125,keep H0
+08 Enfermedades de vías aéreas inferiores,1,3,0.8506595253863475,0.122,0.0125,keep H0
+08 Enfermedades de vías aéreas inferiores,1,2,0.3020326241978926,0.245,0.0125,keep H0
+09 Enfermedades prevenibles por inmunización,0,4,1.3954561235117813,0.031,0.0125,keep H0
+09 Enfermedades prevenibles por inmunización,0,3,1.114605868902161,0.03,0.0125,keep H0
+09 Enfermedades prevenibles por inmunización,0,2,0.6066469174793759,0.06,0.0125,keep H0
+09 Enfermedades prevenibles por inmunización,0,1,0.24696487573866993,0.107,0.0125,keep H0
+10 Enfermedades relacionadas con la atención prenatal y del parto,0,4,5.768708154361769,0.001,0.0125,reject H0
+10 Enfermedades relacionadas con la atención prenatal y del parto,1,4,1.136419533576715,0.04,0.0125,keep H0
+10 Enfermedades relacionadas con la atención prenatal y del parto,1,3,1.0139221960140459,0.023,0.0125,keep H0
+10 Enfermedades relacionadas con la atención prenatal y del parto,1,2,0.31949362940332543,0.172,0.0125,keep H0
+11 Epilepsia,0,4,6.454969054743816,0.001,0.0125,reject H0
+11 Epilepsia,1,4,1.9031786349162012,0.018,0.0125,keep H0
+11 Epilepsia,1,3,1.7481168000881093,0.005,0.0125,reject H0
+11 Epilepsia,2,3,0.5072428020359061,0.031,0.0125,keep H0
+12 Gastroenteritis infecciosas y complicaciones,0,4,5.210214037387888,0.001,0.0125,reject H0
+12 Gastroenteritis infecciosas y complicaciones,1,4,1.2487864100298105,0.066,0.0125,keep H0
+12 Gastroenteritis infecciosas y complicaciones,1,3,1.0520259462628394,0.039,0.0125,keep H0
+12 Gastroenteritis infecciosas y complicaciones,1,2,0.25498313559005314,0.244,0.0125,keep H0
+13 Hipertensión arterial,0,4,13.566878242519806,0.001,0.0125,reject H0
+13 Hipertensión arterial,1,4,2.468406138571987,0.002,0.0125,reject H0
+13 Hipertensión arterial,2,4,0.15865792064081108,0.791,0.0125,keep H0
+13 Hipertensión arterial,2,3,0.04241206871308972,0.905,0.0125,keep H0
+"14 Infecciones de garganta, nariz y oídos",0,4,1.2760775180439732,0.08,0.0125,keep H0
+"14 Infecciones de garganta, nariz y oídos",0,3,1.2635580230721528,0.049,0.0125,keep H0
+"14 Infecciones de garganta, nariz y oídos",0,2,1.001718760163473,0.027,0.0125,keep H0
+"14 Infecciones de garganta, nariz y oídos",0,1,0.4493799768717375,0.057,0.0125,keep H0
+15 Infecciones de la piel y tejido celular subcutáneo,0,4,3.181823764105205,0.004,0.0125,reject H0
+15 Infecciones de la piel y tejido celular subcutáneo,1,4,1.8294567084146958,0.014,0.0125,keep H0
+15 Infecciones de la piel y tejido celular subcutáneo,1,3,1.7517597487630705,0.008,0.0125,reject H0
+15 Infecciones de la piel y tejido celular subcutáneo,2,3,0.11827257407073904,0.45,0.0125,keep H0
+16 Infecciones renales y de vías urinarias,0,4,4.96790932203168,0.001,0.0125,reject H0
+16 Infecciones renales y de vías urinarias,1,4,0.9532246999969367,0.136,0.0125,keep H0
+16 Infecciones renales y de vías urinarias,1,3,0.8376845726167681,0.091,0.0125,keep H0
+16 Infecciones renales y de vías urinarias,1,2,0.5908376512404614,0.066,0.0125,keep H0
+17 Insuficiencia cardíaca,0,4,1.9373564087623378,0.01,0.0125,reject H0
+17 Insuficiencia cardíaca,1,4,1.4325885549180017,0.01,0.0125,reject H0
+17 Insuficiencia cardíaca,2,4,0.16991525497372906,0.709,0.0125,keep H0
+17 Insuficiencia cardíaca,2,3,0.031242760787808008,0.943,0.0125,keep H0
+18 Neumonías bacterianas,0,4,2.5943411581445717,0.001,0.0125,reject H0
+18 Neumonías bacterianas,1,4,1.687487257009942,0.008,0.0125,reject H0
+18 Neumonías bacterianas,2,4,0.6972528243981998,0.047,0.0125,keep H0
+18 Neumonías bacterianas,2,3,0.5013655995278755,0.022,0.0125,keep H0
+19 Úlcera gastrointestinal,0,4,1.3204113501386334,0.052,0.0125,keep H0
+19 Úlcera gastrointestinal,0,3,1.1645908677298566,0.028,0.0125,keep H0
+19 Úlcera gastrointestinal,0,2,0.9513127256724401,0.025,0.0125,keep H0
+19 Úlcera gastrointestinal,0,1,0.18421857176738693,0.247,0.0125,keep H0
+20 Otras condiciones evitables,0,4,21.587124924676928,0.001,0.0125,reject H0
+20 Otras condiciones evitables,1,4,1.2892481120324555,0.041,0.0125,keep H0
+20 Otras condiciones evitables,1,3,1.1062252401185,0.017,0.0125,keep H0
+20 Otras condiciones evitables,1,2,0.7577993539127391,0.009,0.0125,reject H0
+Share of hospitalizations,0,4,2.1987664306769092,0.011333333333333334,0.0125,reject H0
+Share of hospitalizations,1,4,1.8091294233209363,0.005333333333333333,0.0125,reject H0
+Share of hospitalizations,2,4,0.5239818804813566,0.13444444444444445,0.0125,keep H0
+Share of hospitalizations,2,3,0.48208000302819015,0.034888888888888886,0.0125,keep H0

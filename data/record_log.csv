@@ -1,0 +1,80 @@
+year,issue,value,n
+2000,missing or unknown age,NA,54
+2000,province of residence outside the 24 provinces (excluded from rates),88,2081
+2001,missing or unknown age,NA,11
+2001,province of residence outside the 24 provinces (excluded from rates),88,1675
+2001,province of residence outside the 24 provinces (excluded from rates),90,2113
+2002,missing or unknown age,NA,43
+2002,province of residence outside the 24 provinces (excluded from rates),88,1165
+2002,province of residence outside the 24 provinces (excluded from rates),90,2382
+2003,missing or unknown age,NA,40
+2003,province of residence outside the 24 provinces (excluded from rates),88,953
+2003,province of residence outside the 24 provinces (excluded from rates),90,2132
+2004,missing or unknown age,NA,89
+2004,province of residence outside the 24 provinces (excluded from rates),88,842
+2004,province of residence outside the 24 provinces (excluded from rates),90,177
+2005,missing or unknown age,NA,216
+2005,province of residence outside the 24 provinces (excluded from rates),88,1156
+2005,province of residence outside the 24 provinces (excluded from rates),90,109
+2006,missing or unknown age,NA,43
+2006,province of residence outside the 24 provinces (excluded from rates),88,1262
+2006,province of residence outside the 24 provinces (excluded from rates),90,180
+2007,missing or unknown age,NA,119
+2007,province of residence outside the 24 provinces (excluded from rates),88,1319
+2007,province of residence outside the 24 provinces (excluded from rates),90,182
+2008,missing or unknown age,NA,454
+2008,province of residence outside the 24 provinces (excluded from rates),88,1460
+2008,province of residence outside the 24 provinces (excluded from rates),90,327
+2009,missing or unknown age,NA,613
+2009,province of residence outside the 24 provinces (excluded from rates),88,1611
+2009,province of residence outside the 24 provinces (excluded from rates),90,215
+2010,missing or unknown age,NA,1084
+2010,province of residence outside the 24 provinces (excluded from rates),88,1824
+2010,province of residence outside the 24 provinces (excluded from rates),90,305
+2011,missing or unknown age,NA,875
+2011,province of residence outside the 24 provinces (excluded from rates),88,1831
+2011,province of residence outside the 24 provinces (excluded from rates),90,337
+2012,missing or unknown age,NA,1669
+2012,province of residence outside the 24 provinces (excluded from rates),88,1615
+2012,province of residence outside the 24 provinces (excluded from rates),90,263
+2013,3-character code whose category is only partly HECSAP (counted as non-HECSAP),A17,2
+2013,3-character code whose category is only partly HECSAP (counted as non-HECSAP),J15,10
+2013,3-character code whose category is only partly HECSAP (counted as non-HECSAP),J18,58
+2013,3-character code whose category is only partly HECSAP (counted as non-HECSAP),K92,8
+2013,3-character code whose category is only partly HECSAP (counted as non-HECSAP),N39,55
+2013,missing or unknown age,NA,2027
+2013,province of residence outside the 24 provinces (excluded from rates),88,1417
+2013,province of residence outside the 24 provinces (excluded from rates),90,185
+2014,3-character code whose category is only partly HECSAP (counted as non-HECSAP),A17,1
+2014,3-character code whose category is only partly HECSAP (counted as non-HECSAP),G00,2
+2014,3-character code whose category is only partly HECSAP (counted as non-HECSAP),J15,8
+2014,3-character code whose category is only partly HECSAP (counted as non-HECSAP),J18,19
+2014,3-character code whose category is only partly HECSAP (counted as non-HECSAP),K92,1
+2014,3-character code whose category is only partly HECSAP (counted as non-HECSAP),N39,24
+2014,province of residence outside the 24 provinces (excluded from rates),88,809
+2014,province of residence outside the 24 provinces (excluded from rates),90,123
+2015,3-character code whose category is only partly HECSAP (counted as non-HECSAP),J15,12
+2015,3-character code whose category is only partly HECSAP (counted as non-HECSAP),J18,15
+2015,3-character code whose category is only partly HECSAP (counted as non-HECSAP),K92,2
+2015,3-character code whose category is only partly HECSAP (counted as non-HECSAP),N39,5
+2015,province of residence outside the 24 provinces (excluded from rates),88,920
+2015,province of residence outside the 24 provinces (excluded from rates),90,116
+2016,3-character code whose category is only partly HECSAP (counted as non-HECSAP),J18,5
+2016,3-character code whose category is only partly HECSAP (counted as non-HECSAP),K92,5
+2016,3-character code whose category is only partly HECSAP (counted as non-HECSAP),N39,5
+2016,province of residence outside the 24 provinces (excluded from rates),88,492
+2016,province of residence outside the 24 provinces (excluded from rates),90,82
+2017,province of residence outside the 24 provinces (excluded from rates),88,766
+2017,province of residence outside the 24 provinces (excluded from rates),90,75
+2017,sex not Hombre/Mujer (excluded from rates),3,5
+2018,province of residence outside the 24 provinces (excluded from rates),88,1309
+2018,sex not Hombre/Mujer (excluded from rates),3,1
+2019,province of residence outside the 24 provinces (excluded from rates),88,2384
+2019,sex not Hombre/Mujer (excluded from rates),3,1
+2020,province of residence outside the 24 provinces (excluded from rates),88,868
+2020,sex not Hombre/Mujer (excluded from rates),3,2
+2021,province of residence outside the 24 provinces (excluded from rates),88,805
+2022,province of residence outside the 24 provinces (excluded from rates),88,423
+2022,sex not Hombre/Mujer (excluded from rates),3,3
+2023,province of residence outside the 24 provinces (excluded from rates),88,466
+2024,province of residence outside the 24 provinces (excluded from rates),88,514
