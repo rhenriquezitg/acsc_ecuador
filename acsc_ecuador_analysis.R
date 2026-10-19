@@ -45,6 +45,7 @@
 REBUILD_FROM_MICRODATA <- FALSE              # TRUE only with the inectab cache (section 3)
 CACHE_DIR <- "C:/Datasets/ecuador/cache"     # inectab parquet cache of INEC microdata
 SHAPEFILE <- "C:/Datasets/ecuador/ecu_adm_2024/ecu_adm_adm1_2024.shp"
+BEDS_RAW_DIR <- "C:/Datasets/ecuador/camas"   # INEC bed files 2000-2003 (bdd_camas_hosp_<year>_spss.zip, unzipped)
 
 DATA <- "data"; RES <- "results"; FIG <- "figures"
 for (d in c(DATA, RES, FIG)) dir.create(d, showWarnings = FALSE, recursive = TRUE)
@@ -560,6 +561,43 @@ if (REBUILD_FROM_MICRODATA) {
   rm(agg)
 }
 
+# Provincial beds 2000-2003 from the INEC establishment-level files; 2004-2024 come from the
+# published historical series (Tabulados_series_ECEH_2024.xlsx, series 1.5.2 and 1.5.3).
+beds_2000_2003 <- function(raw_dir = BEDS_RAW_DIR) {
+  core <- c("MEDIC", "CIRUG", "GINOB", "PEDIA", "CARDI", "NEUMO", "PSIQU", "TRAUM", "INFEC", "OFTAL",
+            "UROLO", "GASTR", "OTRSE", "SERIN")             # normal-allocation beds exclude emergency and ICU
+  read_year <- function(y) {
+    if (y == 2000) {
+      d <- foreign::read.dbf(file.path(raw_dir, "2000", "ech2000w.dbf"), as.is = TRUE)
+      names(d) <- c("CODESTAD", "ANIESTAD", "PROUBIES", "CLAESTSA", "TIPESTSA", "ENTESTSA", "SECESTSA",
+                    paste0("DOT", core), paste0("DIS", core), "TOTCAMDO", "TOTCAMDI", "DIADISPO", "DIAHOSPI",
+                    "FALMEN48", "FALMAS48", "TOTEGRES")
+    } else {
+      f <- list.files(file.path(raw_dir, y), pattern = "[.]sav$", recursive = TRUE, full.names = TRUE)[1]
+      d <- as.data.frame(haven::zap_labels(haven::read_sav(f)))
+    }
+    tibble(year = y, prov_old = d$PROUBIES, beds_available = as.numeric(d$TOTCAMDI),
+           beds_normal = rowSums(sapply(paste0("DOT", core), function(v) as.numeric(d[[v]]))))
+  }
+  byp <- bind_rows(lapply(2000:2003, read_year)) |> group_by(year, prov_old) |>
+    summarise(across(c(beds_available, beds_normal), sum), .groups = "drop")
+  b04 <- readr::read_csv(file.path(DATA, "beds_province.csv"), show_col_types = FALSE, col_types = cols(province = "c")) |>
+    filter(year == 2004)
+  share <- function(child, parent, v) b04[[v]][b04$province == child] / sum(b04[[v]][b04$province %in% c(child, parent)])
+  bind_rows(lapply(2000:2003, function(y) {
+    x <- byp[byp$year == y & byp$prov_old %in% sprintf("%02d", 1:22), ]
+    out <- tibble(year = y, province = c(x$prov_old, "23", "24"))
+    for (v in c("beds_available", "beds_normal")) {
+      val <- setNames(x[[v]], x$prov_old)
+      s23 <- share("23", "17", v); s24 <- share("24", "09", v)
+      val["23"] <- val["17"] * s23; val["17"] <- val["17"] * (1 - s23)
+      val["24"] <- val["09"] * s24; val["09"] <- val["09"] * (1 - s24)
+      out[[v]] <- round(unname(val[out$province]))
+    }
+    out
+  }))
+}
+
 
 # ---- 4. Load the aggregated data ----------------------------------------------
 # annual : geo (res = residence, occ = occurrence), year, province, sex, age, group, n
@@ -805,22 +843,26 @@ pa10 <- province_analysis(a10, pop, s10, geo); write_res(pa10$table, "prov_no_g1
 
 
 # ---- 10b. Hospital bed supply ------------------------------------------------------------
-# Available hospital beds by province of the establishment, 2004-2024 (INEC, Registro
-# Estadistico de Camas Hospitalarias, series 1.5.2 and 1.5.3; national series 1.4.2 from 1997).
-# Provincial series start in 2004, so the bed analyses cover 2004-2024.
-# Bed counts are smoothed with a five-year running median, which removes one- and two-year
+# Available hospital beds by province of the establishment, 2000-2024 (INEC, Registro
+# Estadistico de Camas Hospitalarias). 2004-2024: published series 1.5.2 and 1.5.3 in 2024
+# boundaries. 2000-2003: sums of the establishment-level files (section 3); Santo Domingo de los
+# Tsachilas and Santa Elena, then part of Pichincha and Guayas, are split with their 2004 shares,
+# and establishments with an unassigned province code (61-72 beds a year) are left out.
+# Bed counts are smoothed with a repeated five-year running median, which removes one- and two-year
 # registration spikes (e.g. Manabi 2008, Esmeraldas 2014-2015, Galapagos 2008 with zero beds);
 # the reported counts are used in a sensitivity analysis.
 
 message("Hospital bed supply")
-BED_YEARS <- 2004:2024
+BED_YEARS <- 2000:2024
 beds <- readr::read_csv(file.path(DATA, "beds_province.csv"), show_col_types = FALSE,
-                        col_types = cols(year = "i", province = "c", beds_available = "d", beds_normal = "d"))
+                        col_types = cols(year = "i", province = "c", beds_available = "d", beds_normal = "d", source = "c"))
 clean_beds <- function(y, b, k = 5, tol = 1.25) {
-  # Five-year running median (Tukey end rule): removes one- and two-year registration spikes and
-  # keeps changes that last three years or more. `flag` marks values changed by more than 25%.
+  # Five-year running median (Tukey end rule) repeated until it no longer changes: removes one- and
+  # two-year registration spikes and keeps changes that last three years or more.
+  # `flag` marks values changed by more than 25%.
   o <- order(y); b <- b[o]
-  bc <- as.numeric(stats::runmed(b, k = k, endrule = "median"))
+  bc <- b
+  repeat { nx <- as.numeric(stats::runmed(bc, k = k, endrule = "median")); if (all(nx == bc)) break; bc <- nx }
   list(beds = bc, flag = b <= 0 | bc > tol * b | bc < b / tol)
 }
 beds <- beds |> group_by(province) |> arrange(year, .by_group = TRUE) |>
@@ -890,6 +932,8 @@ bed_models <- bind_rows(
   fe_model(acsc_p, "b10k_normal", label = "ACSC rate, beds of normal allocation"),
   fe_model(acsc_p, lag = 1, label = "ACSC rate, beds lagged one year"),
   fe_model(acsc_p[!acsc_p$year %in% 2020:2021, ], label = "ACSC rate, 2020-2021 left out"),
+  fe_model(acsc_p[acsc_p$year >= 2004, ], label = "ACSC rate, 2004-2024 (published provincial series)"),
+  fe_model(acsc_p[!(acsc_p$year <= 2003 & acsc_p$province %in% c("09", "17", "23", "24")), ], label = "ACSC rate, split provinces left out in 2000-2003"),
   fe_model(occ_p, label = "ACSC rate by province of the hospital"),
   fe_model(share_p, "b10k_raw", offset = "all_nodeliv", label = "ACSC share, reported bed counts"))
 write_res(bed_models, "beds_models")
@@ -897,8 +941,8 @@ write_res(bed_models, "beds_models")
 # Between-province association: provincial ASR and beds per 10,000 by period (Spearman),
 # and the share of between-province variance of log ASR explained by log beds (2004-2024),
 # with Moran's I before and after adjustment.
-BED_PER <- list("2004–2007" = 2004:2007, "2008–2014" = 2008:2014, "2015–2019" = 2015:2019,
-                "2020–2024" = 2020:2024, "2004–2024" = BED_YEARS)
+BED_PER <- list("2000–2007" = 2000:2007, "2008–2014" = 2008:2014, "2015–2019" = 2015:2019,
+                "2020–2024" = 2020:2024, "2000–2024" = BED_YEARS)
 bed_between <- bind_rows(lapply(names(BED_PER), function(p) {
   yy <- BED_PER[[p]]; sp <- s; sp$years <- yy
   r <- province_rates(a[a$year %in% yy, ], pop[pop$year %in% yy, ], sp)
@@ -1070,16 +1114,16 @@ fs7 <- ggplot(gm4) + geom_sf(aes(fill = cluster), colour = "grey35", linewidth =
   coord_sf(expand = FALSE) + scale_fill_manual(values = LISA_COL, name = "Local Moran's I", drop = FALSE) + mtheme
 save_fig(fs7, "FigureS7", 7.5, 7.5)
 
-# Figure S8. Hospital beds per 10,000 population by province (2004 and 2024) and provincial
+# Figure S8. Hospital beds per 10,000 population by province (2000 and 2024) and provincial
 # ACSC rates against bed supply by period.
-bp <- rd("beds_province_year") |> filter(year %in% c(2004, 2024)) |>
+bp <- rd("beds_province_year") |> filter(year %in% c(2000, 2024)) |>
   mutate(province_name = factor(province_name, province_name[year == 2024][order(b10k[year == 2024])]))
 pS8a <- ggplot(bp, aes(b10k, province_name)) +
   geom_line(aes(group = province_name), colour = "grey70", linewidth = 0.6) +
   geom_point(aes(colour = factor(year)), size = 1.8) +
-  scale_colour_manual(values = c("2004" = "#9ecae1", "2024" = "#08519c"), name = NULL) +
+  scale_colour_manual(values = c("2000" = "#9ecae1", "2024" = "#08519c"), name = NULL) +
   labs(x = "Beds per 10,000 population", y = NULL)
-bap <- rd("beds_asr_province_period") |> filter(period != "2004\u20132024")
+bap <- rd("beds_asr_province_period") |> filter(period != "2000\u20132024")
 bap$period <- factor(bap$period, unique(bap$period))
 pS8b <- ggplot(bap, aes(b10k, asr, colour = period)) + geom_point(size = 1.4) +
   geom_smooth(method = "lm", formula = y ~ x, se = FALSE, linewidth = 0.5) +
