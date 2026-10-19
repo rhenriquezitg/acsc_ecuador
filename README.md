@@ -10,22 +10,24 @@ The study describes hospitalizations for ambulatory care sensitive conditions (A
 
 - national trends (joinpoint regression);
 - changes around the 2008 health reform and the onset of the COVID-19 pandemic (segmented regression);
-- geographic variation between the 24 provinces.
+- geographic variation between the 24 provinces;
+- the association between hospital bed supply and hospitalizations by province, 2004–2024.
 
 ## Contents
 
 | Path | Content |
 |---|---|
 | `acsc_ecuador_analysis.R` | Single script that reproduces every number, table and figure of the article and its supplementary material |
-| `supplementary/Supplementary_material.docx` (and `.pdf`) | Tables S1–S3 and Figures S1–S7 |
+| `supplementary/Supplementary_material.docx` (and `.pdf`) | Tables S1–S3 and Figures S1–S8 |
 | `supplementary/Table_S4.xlsx` | Joinpoint regression of all series |
 | `supplementary/Table_S5.xlsx` | Segmented regression by ACSC group |
 | `supplementary/Table_S6.xlsx` | Sensitivity analyses |
 | `supplementary/Table_S7.xlsx` | Annual age-standardized rates by province, 2000–2024, with 95% confidence intervals |
 | `supplementary/Table_S8.xlsx` | Annual indicators of geographic variation |
+| `supplementary/Table_S9.xlsx` | Hospital bed supply by province and its association with hospitalizations, 2004–2024 |
 | `data/` | Aggregated input data (see below) |
 | `results/` | All results produced by the script, as CSV files |
-| `figures/` | Figures 1–2 of the article and Figures S1–S7 (TIFF 300 dpi and PNG) |
+| `figures/` | Figures 1–2 of the article and Figures S1–S8 (TIFF 300 dpi and PNG) |
 
 ## Data
 
@@ -40,11 +42,13 @@ The study describes hospitalizations for ambulatory care sensitive conditions (A
 | `population.csv.gz` | INEC population projections (revision 2024) by year, province, sex and single year of age |
 | `standard_population.csv` | Standard populations: Ecuador 2022 projected population (main analysis) and WHO world standard (sensitivity) |
 | `icd10_labels.csv` | ICD-10 labels for the codes used |
+| `beds_province.csv` | Available beds and beds of normal allocation by province of the establishment, 2004–2024 (INEC series 1.5.2 and 1.5.3) |
+| `beds_national.csv` | National population, beds, discharges and bed occupancy, 1997–2024 (INEC series 1.4.2) |
 | `provinces_geo.rds` | Provincial boundaries (ADM1 2024) and neighbour lists (queen contiguity and 4 nearest neighbours) |
 
 Group codes: 1–20 are the ACSC groups (defined in section 1 of the script); 99 is deliveries (O80–O84); 0 is all other causes. Sex: 1 men, 2 women. Provinces use the INEC codes 01–24 in current boundaries; 88 and 90 are abroad and non-delimited zones. Age is in completed years, with 100 meaning 100 or older.
 
-The source microdata are the INEC hospital discharge files (*Egresos Hospitalarios*, later *Camas y Egresos Hospitalarios*), 2000–2024. They are publicly available at [ecuadorencifras.gob.ec](https://www.ecuadorencifras.gob.ec). The authors harmonized the files across years and aggregated them with an R package of their own, `inectab`. Section 3 of the script rebuilds `data/` from the harmonized microdata when `REBUILD_FROM_MICRODATA <- TRUE`. The rest of the analysis needs only the files in `data/`.
+Bed counts come from INEC's historical series of the hospital beds and discharges registry (*Tabulados series ECEH 2024*). The source microdata are the INEC hospital discharge files (*Egresos Hospitalarios*, later *Camas y Egresos Hospitalarios*), 2000–2024. They are publicly available at [ecuadorencifras.gob.ec](https://www.ecuadorencifras.gob.ec). The authors harmonized the files across years and aggregated them with an R package of their own, `inectab`. Section 3 of the script rebuilds `data/` from the harmonized microdata when `REBUILD_FROM_MICRODATA <- TRUE`. The rest of the analysis needs only the files in `data/`.
 
 ## Methods in brief
 
@@ -54,6 +58,7 @@ The source microdata are the INEC hospital discharge files (*Egresos Hospitalari
 - **Segmented regression:** quasi-Poisson models with Fourier seasonal terms and Newey–West standard errors.
   - 2008 reform: January 2000–December 2019, interruption in January 2008.
   - COVID-19: January 2012–December 2024, interruption in March 2020.
+- **Hospital beds:** annual provincial counts, 2004–2024, modelled with quasi-Poisson regression with province and year fixed effects, log beds per 10,000 as exposure and expected counts as offset; standard errors clustered by province. Bed counts are smoothed with a five-year running median to remove registration spikes.
 - **Geographic variation:** coefficient of variation, extremal quotient, systematic component of variation, and global and local Moran's I.
 
 ## How to reproduce

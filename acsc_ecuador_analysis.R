@@ -25,6 +25,7 @@
 #   8. Provinces: rates, variation and spatial autocorrelation
 #   9. Age, sex and leading diagnoses
 #  10. Sensitivity analyses
+#  10b. Hospital bed supply by province, 2004-2024
 #  11. Figures (article and supplementary material)
 #
 # Data sources
@@ -33,6 +34,8 @@
 #     private establishments. Open microdata at https://www.ecuadorencifras.gob.ec
 #   - Population: INEC projections by province, sex and single year of age
 #     (revision 2024), provinces in current boundaries.
+#   - Hospital beds: INEC, Registro Estadistico de Camas y Egresos Hospitalarios, historical
+#     series 2024 (Tabulados_series_ECEH_2024.xlsx, series 1.4.2, 1.5.2 and 1.5.3).
 #   - Provincial boundaries: ADM1 2024 (ecu_adm_2024).
 # =============================================================================
 
@@ -801,6 +804,137 @@ write_res(jp10$segments, "jp_no_g10_segments"); write_res(jp10$aapc, "jp_no_g10_
 pa10 <- province_analysis(a10, pop, s10, geo); write_res(pa10$table, "prov_no_g10"); write_res(pa10$moran, "moran_no_g10")
 
 
+# ---- 10b. Hospital bed supply ------------------------------------------------------------
+# Available hospital beds by province of the establishment, 2004-2024 (INEC, Registro
+# Estadistico de Camas Hospitalarias, series 1.5.2 and 1.5.3; national series 1.4.2 from 1997).
+# Provincial series start in 2004, so the bed analyses cover 2004-2024.
+# Bed counts are smoothed with a five-year running median, which removes one- and two-year
+# registration spikes (e.g. Manabi 2008, Esmeraldas 2014-2015, Galapagos 2008 with zero beds);
+# the reported counts are used in a sensitivity analysis.
+
+message("Hospital bed supply")
+BED_YEARS <- 2004:2024
+beds <- readr::read_csv(file.path(DATA, "beds_province.csv"), show_col_types = FALSE,
+                        col_types = cols(year = "i", province = "c", beds_available = "d", beds_normal = "d"))
+clean_beds <- function(y, b, k = 5, tol = 1.25) {
+  # Five-year running median (Tukey end rule): removes one- and two-year registration spikes and
+  # keeps changes that last three years or more. `flag` marks values changed by more than 25%.
+  o <- order(y); b <- b[o]
+  bc <- as.numeric(stats::runmed(b, k = k, endrule = "median"))
+  list(beds = bc, flag = b <= 0 | bc > tol * b | bc < b / tol)
+}
+beds <- beds |> group_by(province) |> arrange(year, .by_group = TRUE) |>
+  mutate(cl = list(clean_beds(year, beds_available)), beds = cl[[1]]$beds, flagged = cl[[1]]$flag,
+         beds_n = clean_beds(year, beds_normal)$beds) |>
+  select(-cl) |> ungroup()
+pop_py <- pop |> filter(province %in% PROVS) |> group_by(year, province) |> summarise(pop = sum(pop), .groups = "drop")
+beds <- left_join(beds, pop_py, by = c("year", "province")) |>
+  mutate(b10k = beds / pop * 1e4, b10k_raw = beds_available / pop * 1e4, b10k_normal = beds_n / pop * 1e4,
+         province_name = REGION_TAB$province_name[match(province, REGION_TAB$province)],
+         region = REGION_TAB$region[match(province, REGION_TAB$province)])
+write_res(beds, "beds_province_year")
+write_res(beds |> filter(flagged) |> select(year, province, province_name, reported = beds_available, smoothed = beds),
+          "beds_flagged_values")
+bn <- readr::read_csv(file.path(DATA, "beds_national.csv"), show_col_types = FALSE) |>
+  mutate(b10k = beds_available / population * 1e4)
+write_res(bn, "beds_national")
+
+# Province-year counts and expected counts (indirect age-sex standardization to the
+# 2004-2024 national rates of each outcome). Outcomes: ACSC, non-ACSC excluding deliveries.
+province_year_panel <- function(geo_basis = "res") {
+  sp <- s; sp$geo <- geo_basis; sp$years <- BED_YEARS
+  aa <- rate_records(prep_annual(dat, sp))
+  pp <- pop[pop$year %in% BED_YEARS, ]
+  out <- list()
+  for (o in c("acsc", "nonacsc")) {
+    x <- if (o == "acsc") aa[aa$hecsap, ] else aa[aa$group == 0L, ]
+    x$age_band <- as.character(band_of(x$age, bands)); pp$age_band <- as.character(band_of(pp$age, bands))
+    ref <- left_join(summarise(group_by(x, age_band, sex), n = sum(n), .groups = "drop"),
+                     summarise(group_by(pp, age_band, sex), pop = sum(pop), .groups = "drop"), by = c("age_band", "sex"))
+    ref$r <- ref$n / ref$pop
+    e <- pp |> group_by(year, province, age_band, sex) |> summarise(pop = sum(pop), .groups = "drop") |>
+      left_join(ref[, c("age_band", "sex", "r")], by = c("age_band", "sex")) |>
+      group_by(year, province) |> summarise(expected = sum(pop * r), .groups = "drop")
+    ob <- x |> group_by(year, province) |> summarise(observed = sum(n), .groups = "drop")
+    out[[o]] <- left_join(e, ob, by = c("year", "province")) |> mutate(observed = coalesce(observed, 0), outcome = o)
+  }
+  bind_rows(out) |> left_join(beds, by = c("year", "province"))
+}
+panel <- province_year_panel("res")
+panel_occ <- province_year_panel("occ")
+write_res(panel, "beds_panel")
+
+# Fixed-effects quasi-Poisson models: log E[y_pt] = a_p + g_t + b * log(beds per 10,000_pt) + log(offset_pt).
+# Offsets: expected counts (rates) or all non-delivery hospitalizations (ACSC share).
+# Standard errors clustered by province. Effect reported per 10% more beds (elasticity).
+fe_model <- function(d, xvar = "b10k", offset = "expected", label = "", lag = 0) {
+  d <- d[order(d$province, d$year), ]
+  if (lag > 0) d <- d |> group_by(province) |> mutate(x = dplyr::lag(.data[[xvar]], lag)) |> ungroup() else d$x <- d[[xvar]]
+  d <- d[!is.na(d$x) & d$x > 0 & d[[offset]] > 0, ]
+  m <- stats::glm(observed ~ log(x) + factor(province) + factor(year) + offset(log(d[[offset]])),
+                  family = stats::quasipoisson(), data = d)
+  V <- sandwich::vcovCL(m, cluster = d$province)
+  b <- stats::coef(m)["log(x)"]; se <- sqrt(V["log(x)", "log(x)"]); k <- log(1.1); z <- stats::qnorm(0.975)
+  data.frame(model = label, n_obs = nrow(d), estimate = 100 * (exp(k * b) - 1), lcl = 100 * (exp(k * (b - z * se)) - 1),
+             ucl = 100 * (exp(k * (b + z * se)) - 1), p = 2 * stats::pnorm(-abs(b / se)), beta = unname(b), se = se)
+}
+acsc_p <- panel[panel$outcome == "acsc", ]; non_p <- panel[panel$outcome == "nonacsc", ]
+share_p <- acsc_p |> left_join(non_p |> transmute(year, province, other = observed), by = c("year", "province")) |>
+  mutate(all_nodeliv = observed + other)
+occ_p <- panel_occ[panel_occ$outcome == "acsc", ]
+bed_models <- bind_rows(
+  fe_model(acsc_p, label = "ACSC hospitalization rate"),
+  fe_model(non_p, label = "Non-ACSC hospitalization rate (excluding deliveries)"),
+  fe_model(share_p, offset = "all_nodeliv", label = "ACSC share of hospitalizations"),
+  fe_model(acsc_p, "b10k_raw", label = "ACSC rate, reported bed counts"),
+  fe_model(acsc_p, "b10k_normal", label = "ACSC rate, beds of normal allocation"),
+  fe_model(acsc_p, lag = 1, label = "ACSC rate, beds lagged one year"),
+  fe_model(acsc_p[!acsc_p$year %in% 2020:2021, ], label = "ACSC rate, 2020-2021 left out"),
+  fe_model(occ_p, label = "ACSC rate by province of the hospital"),
+  fe_model(share_p, "b10k_raw", offset = "all_nodeliv", label = "ACSC share, reported bed counts"))
+write_res(bed_models, "beds_models")
+
+# Between-province association: provincial ASR and beds per 10,000 by period (Spearman),
+# and the share of between-province variance of log ASR explained by log beds (2004-2024),
+# with Moran's I before and after adjustment.
+BED_PER <- list("2004–2007" = 2004:2007, "2008–2014" = 2008:2014, "2015–2019" = 2015:2019,
+                "2020–2024" = 2020:2024, "2004–2024" = BED_YEARS)
+bed_between <- bind_rows(lapply(names(BED_PER), function(p) {
+  yy <- BED_PER[[p]]; sp <- s; sp$years <- yy
+  r <- province_rates(a[a$year %in% yy, ], pop[pop$year %in% yy, ], sp)
+  bb <- beds |> filter(year %in% yy) |> group_by(province) |> summarise(b10k = sum(beds) / sum(pop) * 1e4)
+  d <- left_join(r[, c("province", "province_name", "asr")], bb, by = "province")
+  ct <- suppressWarnings(stats::cor.test(d$asr, d$b10k, method = "spearman"))
+  fit <- stats::lm(log(asr) ~ log(b10k), data = d)
+  v <- d$asr[match(geo$province, d$province)]; res <- stats::residuals(fit)[match(geo$province, d$province)]
+  data.frame(period = p, rho = unname(ct$estimate), rho_p = ct$p.value,
+             slope_10pct = 100 * (1.1^stats::coef(fit)[2] - 1), r2 = summary(fit)$r.squared,
+             moran_asr = moran_analysis(log(v), geo)$global$value, moran_asr_p = moran_analysis(log(v), geo)$global$p_value,
+             moran_resid = moran_analysis(res, geo)$global$value, moran_resid_p = moran_analysis(res, geo)$global$p_value,
+             b10k_min = min(d$b10k), b10k_max = max(d$b10k))
+}))
+write_res(bed_between, "beds_between_province")
+write_res(bind_rows(lapply(names(BED_PER), function(p) {
+  yy <- BED_PER[[p]]; sp <- s; sp$years <- yy
+  r <- province_rates(a[a$year %in% yy, ], pop[pop$year %in% yy, ], sp)
+  bb <- beds |> filter(year %in% yy) |> group_by(province) |> summarise(b10k = sum(beds) / sum(pop) * 1e4)
+  cbind(period = p, left_join(r[, c("province", "province_name", "region", "asr", "asr_lcl", "asr_ucl")], bb, by = "province"))
+})), "beds_asr_province_period")
+
+# Contribution of the change in bed supply to the change in ACSC hospitalizations, 2011-2024:
+# predicted national ACSC count in 2024 with provincial beds as observed versus held at 2011 levels.
+bmain <- bed_models$beta[1]
+ch <- acsc_p |> filter(year %in% c(2011, 2024)) |> select(year, province, b10k, observed, expected) |>
+  tidyr::pivot_wider(names_from = year, values_from = c(b10k, observed, expected))
+bed_contrib <- data.frame(
+  beds_per_10k_2011 = sum(beds$beds[beds$year == 2011]) / sum(beds$pop[beds$year == 2011]) * 1e4,
+  beds_per_10k_2024 = sum(beds$beds[beds$year == 2024]) / sum(beds$pop[beds$year == 2024]) * 1e4,
+  sir_change_pct = 100 * ((sum(ch$observed_2024) / sum(ch$expected_2024)) / (sum(ch$observed_2011) / sum(ch$expected_2011)) - 1),
+  attributable_pct = 100 * (sum(ch$observed_2024) / sum(ch$observed_2024 * (ch$b10k_2011 / ch$b10k_2024)^bmain) - 1))
+bed_contrib$provinces_fewer_beds <- sum(ch$b10k_2024 < ch$b10k_2011)
+write_res(bed_contrib, "beds_contribution_2011_2024")
+
+
 # ---- 11. Figures ------------------------------------------------------------------------
 
 message("Figures")
@@ -935,6 +1069,25 @@ gm4$cluster <- factor(gm4$cluster, names(LISA_COL))
 fs7 <- ggplot(gm4) + geom_sf(aes(fill = cluster), colour = "grey35", linewidth = 0.12) + facet_wrap(~ period, ncol = 2) +
   coord_sf(expand = FALSE) + scale_fill_manual(values = LISA_COL, name = "Local Moran's I", drop = FALSE) + mtheme
 save_fig(fs7, "FigureS7", 7.5, 7.5)
+
+# Figure S8. Hospital beds per 10,000 population by province (2004 and 2024) and provincial
+# ACSC rates against bed supply by period.
+bp <- rd("beds_province_year") |> filter(year %in% c(2004, 2024)) |>
+  mutate(province_name = factor(province_name, province_name[year == 2024][order(b10k[year == 2024])]))
+pS8a <- ggplot(bp, aes(b10k, province_name)) +
+  geom_line(aes(group = province_name), colour = "grey70", linewidth = 0.6) +
+  geom_point(aes(colour = factor(year)), size = 1.8) +
+  scale_colour_manual(values = c("2004" = "#9ecae1", "2024" = "#08519c"), name = NULL) +
+  labs(x = "Beds per 10,000 population", y = NULL)
+bap <- rd("beds_asr_province_period") |> filter(period != "2004\u20132024")
+bap$period <- factor(bap$period, unique(bap$period))
+pS8b <- ggplot(bap, aes(b10k, asr, colour = period)) + geom_point(size = 1.4) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE, linewidth = 0.5) +
+  scale_x_log10() + scale_y_log10(labels = scales::label_comma()) +
+  scale_colour_manual(values = setNames(c("#9ecae1", "#4292c6", "#08519c", "#d95f0e"), levels(bap$period)), name = NULL) +
+  guides(colour = guide_legend(nrow = 2)) +
+  labs(x = "Beds per 10,000 (log scale)", y = "ACSC age-standardized rate per 100,000 (log scale)")
+save_fig(pS8a + pS8b + plot_annotation(tag_levels = "A") + plot_layout(widths = c(1, 1.1)), "FigureS8", 7.5, 4.8)
 
 writeLines(capture.output(sessionInfo()), file.path(RES, "session_info.txt"))
 message("Done. Results in ", RES, "/, figures in ", FIG, "/")
