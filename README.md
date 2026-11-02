@@ -18,6 +18,7 @@ The study describes hospitalizations for ambulatory care sensitive conditions (A
 | Path | Content |
 |---|---|
 | `acsc_ecuador_analysis.R` | Single script that reproduces every number, table and figure of the article and its supplementary material |
+| `tutorial/acsc_ecuador_step_by_step.Rmd` (and `.html`) | Step-by-step version of the whole study, from the INEC microdata (via `inectab`) to the tables and maps, with explanations of each method |
 | `acsc_ecuador_audit.R` | Independent audit: data integrity checks, re-implementation of every method and a register of the numbers quoted in the manuscript |
 | `audit/` | Audit outputs: `audit_checks.csv`, `audit_claims.csv`, `audit_report.txt` |
 | `supplementary/Supplementary_material.docx` (and `.pdf`) | Tables S1–S3 and Figures S1–S9 |

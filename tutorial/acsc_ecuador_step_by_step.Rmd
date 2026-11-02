@@ -1,0 +1,737 @@
+---
+title: "Hospitalizations for ambulatory care-sensitive conditions in Ecuador, 2000–2024: the analysis step by step"
+subtitle: "From the INEC microdata to the tables and maps of the article"
+author: "Martínez-Abarca AL, Henríquez-Trujillo MC, Bonilla JE, Henríquez-Trujillo AR"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    df_print: kable
+params:
+  inectab_src: "C:/Datasets/ecuador/inectab"          # folder (or .tar.gz) of the inectab package
+  data_root: "C:/Datasets/ecuador"                     # contains egresos/ with the INEC SPSS files
+  cache_dir: "C:/Datasets/ecuador/cache"               # inectab Parquet cache
+  build_cache: false                                   # TRUE the first time (about 8 minutes)
+  shapefile: "C:/Datasets/ecuador/ecu_adm_2024/ecu_adm_adm1_2024.shp"
+  geo_rds: ""                                          # optional: data/provinces_geo.rds of the repository
+  beds_xlsx: "C:/Datasets/ecuador/camas/Tabulados_series_ECEH_2024.xlsx"
+  beds_raw_dir: "C:/Datasets/ecuador/camas"            # unzipped bdd_camas_hosp_2000..2003_spss
+  out_dir: "tutorial_output"
+  nperm: 4499                                          # permutations of the joinpoint test
+  repo_results: ""                                     # optional: results/ of the repository, to compare
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.width = 7.5, fig.height = 5, dpi = 110)
+options(width = 110, dplyr.summarise.inform = FALSE)
+```
+
+# How to use this document
+
+This document reproduces the whole study, from the raw INEC files to the tables and maps of the article. Each section explains one step in a few sentences, runs the code and shows the result, so the analysis can be followed, checked and explained.
+
+To run it:
+
+1. Open the file in RStudio and set the paths in the `params` block at the top. The defaults are the folders used by the authors (`C:/Datasets/ecuador`).
+2. Set `build_cache: true` the first time, so that `inectab` reads the 25 SPSS files and builds its cache.
+3. Click **Knit**. The first run takes 15–25 minutes; slow steps save their result in `out_dir` and are reused later.
+
+The numbers obtained here are the ones in the article. The repository <https://github.com/rhenriquezitg/acsc_ecuador> contains the same analysis as a single script (`acsc_ecuador_analysis.R`) and an independent audit (`acsc_ecuador_audit.R`).
+
+**What you need**
+
+* R 4.2 or later and the packages loaded below.
+* The `inectab` package, written by the authors to harmonize the INEC files.
+* The INEC hospital discharge files (*Egresos Hospitalarios* / *Camas y Egresos Hospitalarios*), 2000–2024, from <https://www.ecuadorencifras.gob.ec>, in `data_root/egresos/`.
+* The INEC hospital bed files: the historical series `Tabulados_series_ECEH_2024.xlsx` and the bed files for 2000–2003 (`bdd_camas_hosp_<year>_spss.zip`, unzipped into one folder per year).
+* The provincial boundaries (ADM1 2024 shapefile).
+
+# Set-up
+
+## Packages
+
+```{r packages}
+pkgs <- c("dplyr", "tidyr", "readr", "readxl", "haven", "foreign", "ggplot2", "patchwork", "sf",
+          "spdep", "sandwich", "ggspatial", "ggrepel", "scales", "knitr", "arrow")
+missing <- pkgs[!vapply(pkgs, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing)) install.packages(missing)
+invisible(lapply(pkgs[pkgs != "arrow"], library, character.only = TRUE))
+```
+
+## The inectab package
+
+`inectab` reads each annual SPSS file, applies a crosswalk for that year (variable names, category codes, age units and province codes change between years) and writes one standard table to a Parquet cache. It also provides the population denominators and the ICD-10 tools.
+
+```{r inectab}
+if (!requireNamespace("inectab", quietly = TRUE)) {
+  install.packages(params$inectab_src, repos = NULL, type = "source")
+}
+library(inectab)
+packageVersion("inectab")
+```
+
+## Folders
+
+```{r folders}
+OUT <- params$out_dir
+dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
+saved <- function(name) file.path(OUT, paste0(name, ".rds"))
+SEED <- 2026     # the same seed is used for every permutation test
+```
+
+# Step 1. The hospital discharge records
+
+## Build or open the cache
+
+The first time, `build_cache()` harmonizes the 25 files. Afterwards the cache is opened directly; `open_cache()` returns an Arrow dataset, so filters are applied before data are loaded into memory.
+
+```{r cache}
+if (isTRUE(params$build_cache)) build_cache(params$data_root, params$cache_dir, datasets = "egresos", years = 2000:2024)
+ds <- open_cache(params$cache_dir)
+cache_manifest(params$cache_dir) |> filter(dataset == "egresos") |>
+  select(file_year, n_records, n_log, n_icd_invalid, source_file) |> head()
+```
+
+## What one record contains
+
+Each row is one discharge. The variables used in this study are the year and month of discharge (`event_year`, `event_month`), sex, age in years, province of residence (`prov_res`) and of the hospital (`prov_occ`), and the main diagnosis (`icd10`, normalized to four characters without the dot, e.g. `J159`).
+
+```{r one-year}
+ds |> filter(dataset == "egresos", event_year == 2024) |>
+  select(event_year, event_month, sex, age_years, prov_res, prov_occ, icd10) |>
+  head(5) |> collect()
+```
+
+## Discharges per year
+
+The counts per year are compared with the totals published by INEC (historical series 1.4.2 of the bed and discharge registry). They agree in every year except 2014, where the microdata file has one more record than the published total.
+
+```{r counts}
+n_year <- ds |> filter(dataset == "egresos") |> count(event_year) |> collect() |> arrange(event_year)
+inec_published <- c(671909, 681711, 707825, 723494, 763643, 802943, 863037, 920047, 983286, 1031957, 1090263,
+                    1133556, 1156237, 1178989, 1192749, 1161044, 1128004, 1143765, 1164659, 1195311, 907515,
+                    1038235, 1130603, 1170813, 1132667)
+n_year |> mutate(inec = inec_published, difference = n - inec) |> knitr::kable(big.mark = ",")
+```
+
+# Step 2. Defining ambulatory care-sensitive conditions
+
+## The Brazilian list
+
+We use the 20 groups of Alfradique et al. (2009), the list adopted by the Pan American Health Organization. Each group is defined by ICD-10 codes and assigned to one of four categories.
+
+```{r groups}
+GROUPS <- tibble::tribble(
+  ~group, ~name,                                       ~icd10,                                                       ~category,
+   1L, "Anemia",                                        "D50",                                                        "Other acute",
+   2L, "Angina pectoris",                               "I20",                                                        "Chronic",
+   3L, "Asthma",                                        "J45-J46",                                                    "Chronic",
+   4L, "Nutritional deficiencies",                      "E40-E46, E50-E64",                                           "Other acute",
+   5L, "Diabetes mellitus",                             "E10-E14",                                                    "Chronic",
+   6L, "Female pelvic inflammatory disease",            "N70-N73, N75-N76",                                           "Other acute",
+   7L, "Cerebrovascular diseases",                      "I63-I67, I69, G45-G46",                                      "Chronic",
+   8L, "Lower respiratory tract diseases",              "J20-J21, J40-J44, J47",                                      "Chronic",
+   9L, "Immunization-preventable diseases",             "A17.0, A19, A33-A37, A95, B05-B06, B16, B26, G00.0",         "Vaccine-preventable",
+  10L, "Prenatal and childbirth care conditions",       "A50, O23, P35.0",                                            "Infectious",
+  11L, "Epilepsy",                                      "G40-G41",                                                    "Other acute",
+  12L, "Infectious gastroenteritis",                    "A00-A09, E86",                                               "Infectious",
+  13L, "Hypertension",                                  "I10-I11",                                                    "Chronic",
+  14L, "Ear, nose and throat infections",               "H66, J00-J03, J06, J31",                                     "Infectious",
+  15L, "Skin and subcutaneous infections",              "A46, L01-L04, L08",                                          "Infectious",
+  16L, "Kidney and urinary tract infections",           "N10-N12, N30, N34, N39.0",                                   "Infectious",
+  17L, "Heart failure",                                 "I50, J81",                                                   "Chronic",
+  18L, "Bacterial pneumonia",                           "J13-J14, J15.3-J15.4, J15.8-J15.9, J18.1",                   "Vaccine-preventable",
+  19L, "Gastrointestinal ulcer",                        "K25-K28, K92.0-K92.2",                                       "Other acute",
+  20L, "Other avoidable conditions",                    "A15-A16, A17.1-A17.9, A18, A51-A53, B50-B54, B77, I00-I02",  "Vaccine-preventable")
+GROUPS$label <- sprintf("%02d %s", GROUPS$group, GROUPS$name)
+CATEGORIES <- c("Chronic", "Infectious", "Vaccine-preventable", "Other acute")
+knitr::kable(GROUPS[, c("group", "name", "icd10", "category")])
+```
+
+## How a code is matched
+
+`icd_match()` reads a specification such as `"J13-J14, J15.3-J15.4"`. A three-character code (`J13`) includes all its subcategories; a four-character code (`J15.3`) only itself.
+
+```{r icd-demo}
+codes <- c("J13", "J139", "J153", "J155", "J159", "J18", "J181", "J189")
+data.frame(code = codes, bacterial_pneumonia = icd_match(codes, GROUPS$icd10[18]))
+```
+
+Note `J18`: a record coded only with the three-character category J18 cannot be classified, because only J18.1 belongs to the list. These records (237 in 25 years) are counted as non-ACSC and listed in the log.
+
+## A classification function
+
+Each distinct code is matched once against the 20 groups; the result is a lookup table. A code that matched two groups would stop the analysis (it never happens). Deliveries (O80–O84) are flagged as group 99 to report them separately; all other diagnoses are group 0.
+
+```{r classify}
+classify_codes <- function(codes) {
+  codes <- unique(codes[!is.na(codes)])
+  hit <- vapply(GROUPS$icd10, function(s) icd_match(codes, s), logical(length(codes)))
+  if (any(rowSums(hit) > 1)) stop("A code matches two groups")
+  stats::setNames(ifelse(rowSums(hit) == 0, 0L, GROUPS$group[max.col(hit, ties.method = "first")]), codes)
+}
+partial <- c("A17", "G00", "J15", "J18", "K92", "N39", "P35")   # categories only partly in the list
+```
+
+# Step 3. From 25 million records to analysis tables
+
+Rates need counts by year, province, sex, single year of age and group. We read one year at a time, apply the 2024 provincial boundaries (Santo Domingo de los Tsáchilas and Santa Elena were created in 2007; earlier records are reassigned by canton of residence), classify the diagnosis and count. We keep three tables:
+
+* `annual`: year × province (residence and hospital) × sex × age × group;
+* `monthly`: year × month × age × group, for the interrupted time series;
+* `icd`: the ACSC records by ICD-10 code, to describe the leading diagnoses.
+
+```{r aggregate}
+if (file.exists(saved("aggregates"))) {
+  agg <- readRDS(saved("aggregates"))
+} else {
+  agg <- list(annual = list(), monthly = list(), icd = list(), log = list())
+  for (y in 2000:2024) {
+    d <- ds |> filter(dataset == "egresos", event_year == y) |>
+      select(event_year, event_month, sex, age_years, prov_res, cant_res, prov_occ, cant_occ, icd10) |> collect()
+    d <- apply_geo_scheme(d, "dpa_2024")
+    lk <- classify_codes(d$icd10)
+    d$group <- unname(lk[d$icd10]); d$group[is.na(d$group)] <- 0L
+    d$group[d$group == 0L & icd_match(d$icd10, "O80-O84")] <- 99L
+    d$age <- as.integer(pmin(floor(d$age_years), 100))
+    for (g in c("res", "occ")) {
+      agg$annual[[length(agg$annual) + 1]] <- d |>
+        transmute(geo = g, year = event_year, province = .data[[paste0("prov_", g)]], sex, age, group) |>
+        count(geo, year, province, sex, age, group)
+    }
+    agg$monthly[[y - 1999]] <- d |> count(year = event_year, month = event_month, age, group)
+    agg$icd[[y - 1999]] <- d |> filter(group %in% 1:20) |> count(year = event_year, province = prov_res, sex, age, group, icd10)
+    agg$log[[y - 1999]] <- tibble(year = y,
+      partial_code = sum(nchar(d$icd10) == 3 & d$icd10 %in% partial, na.rm = TRUE),
+      missing_age = sum(is.na(d$age)), unknown_sex = sum(!d$sex %in% c("1", "2")),
+      outside_24_provinces = sum(is.na(d$prov_res) | !d$prov_res %in% sprintf("%02d", 1:24)),
+      missing_month = sum(is.na(d$event_month)))
+    message(y, ": ", nrow(d), " discharges")
+  }
+  agg <- lapply(agg, bind_rows)
+  saveRDS(agg, saved("aggregates"))
+}
+annual <- agg$annual; monthly <- agg$monthly; icd <- agg$icd
+agg$log |> summarise(across(-year, sum)) |> knitr::kable(big.mark = ",")
+```
+
+The log above gives the numbers reported in the Methods: 237 partial codes, 7,337 discharges with missing age, 12 with unknown sex and 39,270 residents abroad or in non-delimited zones. These records are counted in totals and left out of rates.
+
+```{r helpers}
+PROVS <- sprintf("%02d", 1:24)
+res <- annual |> filter(geo == "res") |>
+  mutate(acsc = group %in% 1:20, category = GROUPS$category[match(group, GROUPS$group)])
+usable <- function(d) d |> filter(!is.na(age), sex %in% c("1", "2"), province %in% PROVS)
+PER <- c("2000–2007", "2008–2014", "2015–2019", "2020–2024")
+period_of <- function(y) as.character(cut(y, c(1999, 2007, 2014, 2019, 2024), labels = PER))
+```
+
+# Step 4. Population denominators and the standard population
+
+`inec_population()` returns the INEC projections (revision 2024) by year, province, sex and single year of age, already in 2024 boundaries. The standard population for age standardization is Ecuador's projected population in 2022; the WHO world standard is used in a sensitivity analysis.
+
+```{r population}
+pop <- inec_population() |> filter(year %in% 2000:2024) |> rename(province = prov)
+pop |> group_by(year) |> summarise(population = sum(pop)) |> filter(year %in% c(2000, 2011, 2024))
+std_ec <- standard_population("ecuador_2022")
+std_who <- standard_population("who")
+```
+
+We use 18 five-year age groups, the last one open (85+). The weights are the shares of the standard population in each group.
+
+```{r bands}
+band <- function(age) pmin(age %/% 5, 17)
+band_lab <- c(paste0(seq(0, 80, 5), "–", seq(4, 84, 5)), "85+")
+weights_of <- function(s) { w <- tapply(s$weight, band(s$age), sum); w / sum(w) }
+W <- weights_of(std_ec); W_who <- weights_of(std_who)
+data.frame(age_group = band_lab, ecuador_2022 = round(W, 4), who = round(W_who, 4)) |> head(6)
+```
+
+# Step 5. Description of the hospitalizations (Table 1)
+
+```{r table1}
+ann <- res |> group_by(year) |>
+  summarise(acsc = sum(n[acsc]), all = sum(n), deliveries = sum(n[group == 99]), residents = sum(n[province %in% PROVS])) |>
+  left_join(pop |> group_by(year) |> summarise(pop = sum(pop)), by = "year") |>
+  mutate(share = 100 * acsc / all, per_1000 = 1000 * residents / pop)
+tab1 <- ann |> mutate(period = period_of(year)) |> group_by(period) |>
+  summarise(ACSC = sum(acsc), all = sum(all), `per 1,000/year` = 1000 * sum(residents) / sum(pop)) |>
+  bind_rows(ann |> summarise(period = "2000–2024", ACSC = sum(acsc), all = sum(all), `per 1,000/year` = 1000 * sum(residents) / sum(pop))) |>
+  mutate(`ACSC, % of all` = 100 * ACSC / all)
+knitr::kable(tab1, digits = 1, format.args = list(big.mark = ","))
+```
+
+Of 25,074,262 discharges, 3,792,560 (15.1%) were ACSC. The distribution by category and group:
+
+```{r categories}
+res |> filter(acsc) |> group_by(category) |> summarise(n = sum(n)) |> mutate(pct = 100 * n / sum(n)) |> arrange(-n)
+res |> filter(acsc) |> group_by(group) |> summarise(n = sum(n)) |> mutate(pct = 100 * n / sum(n)) |>
+  left_join(GROUPS[, c("group", "name")], by = "group") |> arrange(-n) |> head(4)
+```
+
+# Step 6. Age-standardized rates
+
+## The calculation, by hand, for one year
+
+Direct standardization applies the age-specific rates of the study population to the standard population: ASR = Σ wᵢ · (dᵢ / Nᵢ) × 100,000, where dᵢ are hospitalizations, Nᵢ the population and wᵢ the standard weight of age group *i*. The confidence interval uses the gamma method of Fay and Feuer (1997), which is accurate when counts are small.
+
+```{r asr-by-hand}
+h24 <- res |> filter(year == 2024, acsc) |> usable() |> group_by(b = band(age)) |> summarise(d = sum(n))
+p24 <- pop |> filter(year == 2024) |> group_by(b = band(age)) |> summarise(N = sum(pop))
+by_hand <- h24 |> left_join(p24, by = "b") |> mutate(rate = d / N * 1e5, w = W[b + 1], contribution = w * rate)
+knitr::kable(head(by_hand, 5), digits = 4)
+sum(by_hand$contribution)     # age-standardized rate per 100,000, 2024
+```
+
+## A function for any subset
+
+```{r asr-function}
+asr_of <- function(cnt, pp, w = W) {
+  d <- tapply(cnt$n, factor(band(cnt$age), 0:17), sum); d[is.na(d)] <- 0
+  N <- tapply(pp$pop, factor(band(pp$age), 0:17), sum)
+  asr <- sum(w * d / N) * 1e5
+  v <- sum((w / N)^2 * d) * 1e10; wm <- max(w / N) * 1e5          # Fay-Feuer gamma limits
+  tibble(n = sum(d), asr = asr, se = sqrt(v),
+         lcl = if (v > 0) qgamma(0.025, asr^2 / v, scale = v / asr) else 0,
+         ucl = qgamma(0.975, (asr + wm)^2 / (v + wm^2), scale = (v + wm^2) / (asr + wm)))
+}
+U <- usable(res)
+rate_series <- function(sel = function(d) d$acsc, sex = NULL, w = W) {
+  bind_rows(lapply(2000:2024, function(y) {
+    cn <- U[U$year == y & sel(U), ]; pp <- pop[pop$year == y, ]
+    if (!is.null(sex)) { cn <- cn[cn$sex == sex, ]; pp <- pp[pp$sex == sex, ] }
+    asr_of(cn, pp, w) |> mutate(year = y, .before = 1)
+  }))
+}
+nat <- rate_series()
+nat |> filter(year %in% c(2000, 2010, 2011, 2024))
+```
+
+The rate was 1,016.6 per 100,000 in 2000, peaked at 1,195.9 in 2010 and was 897.2 in 2024.
+
+```{r series}
+men <- rate_series(sex = "1"); women <- rate_series(sex = "2")
+cats <- lapply(setNames(CATEGORIES, CATEGORIES), function(k) rate_series(function(d) d$category %in% k))
+grps <- lapply(setNames(1:20, GROUPS$label), function(g) rate_series(function(d) d$group == g))
+nat_who <- rate_series(w = W_who)
+```
+
+# Step 7. Joinpoint regression
+
+## The idea
+
+A joinpoint model is a set of straight lines on the log scale, joined at the years where the trend changes. On the log scale, a slope *b* means the rate changes by 100·(e^b − 1)% per year: the annual percentage change (APC). Years with more precise rates count more (weights = 1/variance of the log rate). The average annual percentage change (AAPC) summarizes the whole period.
+
+```{r jp-fit}
+jp_design <- function(x, knots) { X <- cbind(1, x); for (k in knots) X <- cbind(X, pmax(x - k, 0)); X }
+jp_fit <- function(year, rate, se, knots) {
+  y <- log(rate); w <- (rate / se)^2; X <- jp_design(year, knots)
+  f <- lm.wfit(X, y, w); b <- f$coefficients
+  df <- length(y) - ncol(X) - length(knots)               # joinpoints count as parameters (NCI convention)
+  V <- sum(w * f$residuals^2) / df * solve(crossprod(X * sqrt(w))); tq <- qt(0.975, df)
+  starts <- c(min(year), knots); ends <- c(knots, max(year))
+  L <- t(sapply(seq_along(starts), function(j) c(0, 1, rep(1, j - 1), rep(0, length(knots) - j + 1))))
+  sl <- drop(L %*% b); se_s <- sqrt(diag(L %*% V %*% t(L)))
+  seg <- tibble(start = starts, end = ends, apc = 100 * (exp(sl) - 1), lcl = 100 * (exp(sl - tq * se_s) - 1),
+                ucl = 100 * (exp(sl + tq * se_s) - 1), p = 2 * pt(-abs(sl / se_s), df))
+  l <- colSums(L * (ends - starts)) / sum(ends - starts); a <- sum(l * b); sa <- sqrt(drop(t(l) %*% V %*% l))
+  list(segments = seg, aapc = c(aapc = 100 * (exp(a) - 1), lcl = 100 * (exp(a - tq * sa) - 1), ucl = 100 * (exp(a + tq * sa) - 1),
+                                p = 2 * pt(-abs(a / sa), df)),
+       fitted = exp(drop(X %*% b)), rss = sum(w * f$residuals^2))
+}
+```
+
+## Where are the joinpoints?
+
+For a given number of joinpoints *k*, every allowed combination of years is tried (at least two observations from each end and between joinpoints) and the one with the smallest weighted residual sum of squares is kept. With one joinpoint, the best year for the national series is 2011:
+
+```{r jp-grid, fig.height = 3}
+rss1 <- sapply(2002:2022, function(k) jp_fit(nat$year, nat$asr, nat$se, k)$rss)
+ggplot(data.frame(year = 2002:2022, rss = rss1), aes(year, rss)) + geom_line() + geom_point() +
+  labs(x = "Year of the joinpoint", y = "Weighted residual sum of squares") + theme_classic()
+```
+
+## How many joinpoints? The permutation test
+
+Kim et al. (2000) compare a model with *a* joinpoints with one with *b* > *a* joinpoints. The residuals of the simpler model are shuffled many times (4,499) to see how often a better fit than the observed one arises by chance. The tests run in sequence, from 0 against the maximum (4 for 25 years), at a Bonferroni-corrected level. To make this feasible, all permuted series are fitted at once with matrix algebra.
+
+```{r jp-select}
+jp_candidates <- function(n, k) {
+  if (k == 0) return(list(integer()))
+  idx <- 3:(n - 2); if (length(idx) < k) return(list())
+  Filter(function(p) k == 1 || all(diff(p) >= 3), utils::combn(idx, k, simplify = FALSE))
+}
+jp_select <- function(year, rate, se, kmax = 4, nperm = params$nperm, alpha = 0.05) {
+  set.seed(SEED); y <- log(rate); w <- (rate / se)^2; sw <- sqrt(w); n <- length(y)
+  cands <- lapply(0:kmax, function(k) jp_candidates(n, k))
+  best <- lapply(cands, function(cl) { r <- sapply(cl, function(p) jp_fit(year, rate, se, year[p])$rss); cl[[which.min(r)]] })
+  rss <- sapply(best, function(p) jp_fit(year, rate, se, year[p])$rss)
+  Qs <- lapply(cands, function(cl) lapply(cl, function(p) qr.Q(qr(jp_design(year, year[p]) * sw))))
+  min_rss <- function(Q, Yw) { out <- rep(Inf, ncol(Yw)); for (q in Q) out <- pmin(out, colSums((Yw - q %*% crossprod(q, Yw))^2)); out }
+  a <- 0; b <- kmax; tests <- NULL
+  while (a < b) {
+    stat <- (rss[a + 1] - rss[b + 1]) / rss[b + 1]
+    f0 <- jp_fit(year, rate, se, year[best[[a + 1]]]); fit0 <- log(f0$fitted); r0 <- (y - fit0) * sw
+    Yw <- vapply(seq_len(nperm), function(i) fit0 * sw + sample(r0), numeric(n))
+    perm <- (min_rss(Qs[[a + 1]], Yw) - min_rss(Qs[[b + 1]], Yw)) / min_rss(Qs[[b + 1]], Yw)
+    p <- (sum(perm >= stat) + 1) / (nperm + 1)
+    tests <- rbind(tests, data.frame(H0 = a, H1 = b, p = p, level = alpha / kmax))
+    if (p < alpha / kmax) a <- a + 1 else b <- b - 1
+  }
+  list(k = a, knots = year[best[[a + 1]]], tests = tests)
+}
+sel_nat <- jp_select(nat$year, nat$asr, nat$se)
+sel_nat$tests
+jp_nat <- jp_fit(nat$year, nat$asr, nat$se, sel_nat$knots)
+jp_nat$segments; round(jp_nat$aapc, 3)
+```
+
+The national rate rose by 2.0% per year until 2011 (95%CI 0.4–3.7) and fell by 3.1% per year afterward (95%CI −4.3 to −1.9); AAPC −0.8%.
+
+## Table 2: all series
+
+The same procedure is applied to men, women, the four categories and the ACSC share of all hospitalizations (binomial standard error). Group series use 999 permutations to save time.
+
+```{r table2}
+if (file.exists(saved("joinpoint"))) {
+  JP <- readRDS(saved("joinpoint"))
+} else {
+  share <- ann |> transmute(year, asr = share, se = 100 * sqrt((acsc / all) * (1 - acsc / all) / all))
+  SERIES <- c(list(`All ACSC` = nat, Men = men, Women = women), cats, list(`ACSC share` = share))
+  JP <- lapply(SERIES, function(s) { sl <- jp_select(s$year, s$asr, s$se); jp_fit(s$year, s$asr, s$se, sl$knots) })
+  JP_groups <- lapply(grps, function(s) { s <- s[s$asr > 0, ]; sl <- jp_select(s$year, s$asr, s$se, nperm = 999); jp_fit(s$year, s$asr, s$se, sl$knots) })
+  JP <- c(JP, JP_groups); saveRDS(JP, saved("joinpoint"))
+}
+table2 <- bind_rows(lapply(names(JP)[1:8], function(k) JP[[k]]$segments |>
+  mutate(series = ifelse(row_number() == 1, k, ""), .before = 1) |>
+  mutate(AAPC = ifelse(row_number() == 1, sprintf("%.1f (%.1f to %.1f)", JP[[k]]$aapc[1], JP[[k]]$aapc[2], JP[[k]]$aapc[3]), ""))))
+knitr::kable(table2, digits = c(0, 0, 0, 1, 1, 1, 3, 0))
+```
+
+## Figure 1
+
+```{r figure1, fig.height = 8}
+d1 <- bind_rows(mutate(nat, series = "Total", fit = jp_nat$fitted),
+                mutate(men, series = "Men", fit = JP$Men$fitted), mutate(women, series = "Women", fit = JP$Women$fitted))
+REF <- list(geom_vline(xintercept = 2008, linetype = "dotted", colour = "grey45"),
+            geom_vline(xintercept = 2020 + 2 / 12, linetype = "dashed", colour = "grey45"))
+pA <- ggplot(d1, aes(year, asr, colour = series)) + REF + geom_line(aes(y = fit), linewidth = 0.7) +
+  geom_errorbar(aes(ymin = lcl, ymax = ucl), width = 0.25) + geom_point(size = 1.4) +
+  scale_colour_manual(values = c(Total = "#2b2b2b", Men = "#2c7fb8", Women = "#d95f0e"), name = NULL) +
+  labs(x = NULL, y = "Age-standardized rate per 100,000") + theme_classic() + theme(legend.position = "bottom")
+pB <- ggplot(ann, aes(year)) + REF + geom_line(aes(y = share, colour = "ACSC, % of all hospitalizations")) +
+  geom_line(aes(y = per_1000 / 4, colour = "Hospitalizations per 1,000 (right axis)"), linetype = "22") +
+  scale_y_continuous("% of hospitalizations", limits = c(0, 25), sec.axis = sec_axis(~ . * 4, name = "Hospitalizations per 1,000")) +
+  scale_colour_manual(values = c("#1f5f99", "grey30"), name = NULL) + labs(x = NULL) + theme_classic() + theme(legend.position = "bottom")
+pA / pB + plot_annotation(tag_levels = "A")
+```
+
+# Step 8. Segmented regression: the 2008 reform and COVID-19
+
+## The model
+
+An interrupted time series compares the trend before an event with the level and trend after it. For monthly counts *y*ₜ:
+
+log E[*y*ₜ] = β₀ + β₁·t + β₂·post + β₃·time since + Fourier terms + log(offset)
+
+* β₂ is the immediate change in level, β₃ the change in trend (×12 for a yearly figure);
+* two pairs of sine and cosine terms remove the seasonal cycle;
+* quasi-Poisson regression allows for overdispersion, and Newey–West standard errors (lag 12) allow for autocorrelation;
+* the offset is the population (for rates) or all hospitalizations (for the ACSC share).
+
+The monthly population is interpolated from the 30 June values.
+
+```{r its}
+monthly_pop <- function(years) {
+  py <- pop |> filter(year %in% years) |> group_by(year) |> summarise(pop = sum(pop)); x <- py$year + 0.5
+  g <- expand.grid(month = 1:12, year = years); tt <- g$year + (g$month - 0.5) / 12
+  g$off <- approx(x, py$pop, xout = tt, rule = 2)$y
+  s1 <- diff(py$pop[1:2]); s2 <- diff(tail(py$pop, 2))
+  g$off[tt < min(x)] <- py$pop[1] + s1 * (tt[tt < min(x)] - x[1]); g$off[tt > max(x)] <- tail(py$pop, 1) + s2 * (tt[tt > max(x)] - max(x))
+  g
+}
+month_series <- function(years, grp) monthly |> filter(year %in% years, group %in% grp) |> group_by(year, month) |> summarise(n = sum(n))
+its <- function(years, start, grp, offset = c("pop", "hosp")) {
+  offset <- match.arg(offset)
+  d <- if (offset == "pop") monthly_pop(years) else rename(month_series(years, c(0:20, 99)), off = n)
+  d <- left_join(d, month_series(years, grp), by = c("year", "month")) |> arrange(year, month)
+  d$n[is.na(d$n)] <- 0; d$t <- seq_len(nrow(d)); t0 <- which(d$year == start[1] & d$month == start[2])
+  d <- d |> mutate(post = as.integer(t >= t0), since = pmax(0, t - t0), s1 = sin(2 * pi * month / 12), c1 = cos(2 * pi * month / 12),
+                   s2 = sin(4 * pi * month / 12), c2 = cos(4 * pi * month / 12))
+  m <- glm(n ~ t + post + since + s1 + c1 + s2 + c2 + offset(log(off)), family = quasipoisson(), data = d)
+  V <- NeweyWest(m, lag = 12, prewhite = FALSE, adjust = TRUE); b <- coef(m)
+  pct <- function(l) { e <- sum(l * b[names(l)]); s <- sqrt(drop(t(l) %*% V[names(l), names(l)] %*% l))
+                       c(est = 100 * (exp(e) - 1), lcl = 100 * (exp(e - 1.96 * s) - 1), ucl = 100 * (exp(e + 1.96 * s) - 1), p = 2 * pnorm(-abs(e / s))) }
+  cf <- mutate(d, post = 0, since = 0)
+  d$fitted <- predict(m, d, type = "response"); d$counterfactual <- predict(m, cf, type = "response")
+  list(effects = rbind(pre_trend = pct(c(t = 12)), level = pct(c(post = 1)), trend_change = pct(c(since = 12)),
+                       post_trend = pct(c(t = 12, since = 12))),
+       obs_exp = c(observed = sum(d$n[d$post == 1]), expected = sum(d$counterfactual[d$post == 1])), data = d)
+}
+```
+
+## The 2008 reform
+
+```{r reform}
+reform <- list(acsc = its(2000:2019, c(2008, 1), 1:20), non_acsc = its(2000:2019, c(2008, 1), c(0, 99)),
+               share = its(2000:2019, c(2008, 1), 1:20, "hosp"),
+               chronic = its(2000:2019, c(2008, 1), GROUPS$group[GROUPS$category == "Chronic"]))
+lapply(reform, function(f) round(f$effects, 3))
+round(1 - reform$share$obs_exp["observed"] / reform$share$obs_exp["expected"], 3)
+```
+
+ACSC hospitalizations rose by 7.1% in January 2008 and other hospitalizations by 15.4%, so the ACSC share fell by 6.0%; from 2008 to 2019, ACSC were 8.5% below the level expected from the pre-reform share. After the interruption, both series declined at similar rates.
+
+```{r reform-sensitivity}
+s2012 <- list(acsc = its(2000:2019, c(2012, 1), 1:20), non_acsc = its(2000:2019, c(2012, 1), c(0, 99)),
+              share = its(2000:2019, c(2012, 1), 1:20, "hosp"))
+sapply(s2012, function(f) round(f$effects["trend_change", ], 3))
+```
+
+## COVID-19
+
+```{r covid}
+covid <- list(acsc = its(2012:2024, c(2020, 3), 1:20), non_acsc = its(2012:2024, c(2020, 3), c(0, 99)),
+              share = its(2012:2024, c(2020, 3), 1:20, "hosp"))
+sapply(covid, function(f) round(f$effects["level", ], 3))
+covid$acsc$obs_exp
+```
+
+## Figure S4
+
+```{r figureS4, fig.height = 7}
+its_plot <- function(f, title, scale = 1, ylab = "Hospitalizations per 100,000 per month") {
+  d <- f$data |> mutate(date = as.Date(sprintf("%d-%02d-15", year, month)), rate = n / off * 1e5 * scale,
+                        fit = fitted / off * 1e5 * scale, cf = counterfactual / off * 1e5 * scale)
+  ggplot(d, aes(date)) + geom_point(aes(y = rate), size = 0.6, colour = "grey35") +
+    geom_line(aes(y = cf), data = d[d$post == 1, ], colour = "#c0392b", linetype = "dashed") +
+    geom_line(aes(y = fit, group = post), colour = "#1f5f99") + expand_limits(y = 0) +
+    labs(x = NULL, y = ylab, subtitle = title) + theme_classic()
+}
+(its_plot(reform$acsc, "2008 reform: ACSC") | its_plot(reform$share, "2008 reform: ACSC share", 1e-3, "% of hospitalizations")) /
+  (its_plot(covid$acsc, "COVID-19: ACSC") | its_plot(covid$non_acsc, "COVID-19: non-ACSC")) + plot_annotation(tag_levels = "A")
+```
+
+The fitted lines here include the seasonal terms; the article shows the deseasonalized trend.
+
+# Step 9. Provinces
+
+## Provincial rates and geographic variation
+
+Rates are computed by province of residence for each period. Three indicators summarize the differences: the extremal quotient (highest/lowest rate), the coefficient of variation (CV) and the systematic component of variation (SCV; McPherson et al., 1982). The SCV compares observed with expected counts (indirect standardization by age and sex) and subtracts the part of the variation expected from chance.
+
+```{r provinces}
+PNAME <- c("Azuay", "Bolívar", "Cañar", "Carchi", "Cotopaxi", "Chimborazo", "El Oro", "Esmeraldas", "Guayas", "Imbabura",
+           "Loja", "Los Ríos", "Manabí", "Morona Santiago", "Napo", "Pastaza", "Pichincha", "Tungurahua", "Zamora Chinchipe",
+           "Galápagos", "Sucumbíos", "Orellana", "Santo Domingo de los Tsáchilas", "Santa Elena")
+prov_rates <- function(years) bind_rows(lapply(PROVS, function(p)
+  asr_of(U[U$year %in% years & U$province == p & U$acsc, ], pop[pop$year %in% years & pop$province == p, ]) |> mutate(province = p, .before = 1)))
+scv_of <- function(years) {
+  h <- U[U$year %in% years & U$acsc, ] |> mutate(b = band(age)); pp <- pop |> filter(year %in% years) |> mutate(b = band(age))
+  ref <- h |> group_by(b, sex) |> summarise(n = sum(n)) |> left_join(pp |> group_by(b, sex) |> summarise(N = sum(pop)), by = c("b", "sex"))
+  E <- pp |> group_by(province, b, sex) |> summarise(N = sum(pop)) |> left_join(ref |> transmute(b, sex, r = n / N), by = c("b", "sex")) |>
+    group_by(province) |> summarise(E = sum(N * r))
+  O <- h |> group_by(province) |> summarise(O = sum(n)); x <- left_join(E, O, by = "province")
+  (mean(((x$O - x$E) / x$E)^2) - mean(1 / x$E)) * 100
+}
+YRS <- setNames(c(lapply(PER, function(p) (2000:2024)[period_of(2000:2024) == p]), list(2000:2024)), c(PER, "2000–2024"))
+PR <- lapply(YRS, prov_rates)
+variation <- bind_rows(lapply(names(YRS), function(p) { a <- PR[[p]]$asr
+  tibble(period = p, EQ = max(a) / min(a), CV = 100 * sd(a) / mean(a), SCV = scv_of(YRS[[p]])) }))
+knitr::kable(variation, digits = 1)
+PR$`2000–2024` |> mutate(name = PNAME[as.integer(province)]) |> arrange(-asr) |> select(name, asr, lcl, ucl) |> head(5)
+```
+
+## The map
+
+```{r geometry}
+if (nzchar(params$geo_rds) && file.exists(params$geo_rds)) {
+  geo <- readRDS(params$geo_rds)
+} else {
+  sf::sf_use_s2(FALSE)
+  s <- sf::st_read(params$shapefile, quiet = TRUE) |> mutate(province = substr(ADM1_PCODE, 3, 4)) |> arrange(province) |> sf::st_make_valid()
+  geo <- list(geo = sf::st_transform(sf::st_simplify(sf::st_transform(s, 32717), dTolerance = 250), 4326),
+              nb = list(queen = spdep::poly2nb(s, queen = TRUE, snap = 1e-4),
+                        knn4 = spdep::knn2nb(spdep::knearneigh(sf::st_coordinates(sf::st_point_on_surface(s)), k = 4, longlat = TRUE))),
+              province = s$province)
+}
+sf::sf_use_s2(FALSE)
+g <- geo$geo; gm <- sf::st_geometry(g); i <- g$province == "20"; gm[i] <- gm[i] + c(7, 0)   # Galápagos moved 7° east
+sf::st_geometry(g) <- sf::st_set_crs(gm, sf::st_crs(geo$geo))
+```
+
+## Spatial autocorrelation: Moran's I and LISA
+
+Moran's I measures whether neighbouring provinces have similar rates (I > 0) or not. Neighbours share a border (queen contiguity); Galápagos has none. The p-value comes from 999 random reassignments of the rates to provinces. The local version (LISA) asks the same question for each province; with 24 tests, the Benjamini–Hochberg correction controls false positives. An empirical Bayes version shrinks unstable rates of small provinces towards the mean.
+
+```{r moran}
+lw <- nb2listw(geo$nb$queen, style = "W", zero.policy = TRUE)
+moran_by_period <- bind_rows(lapply(names(YRS), function(p) {
+  x <- PR[[p]]$asr[match(geo$province, PR[[p]]$province)]
+  set.seed(SEED); gm_ <- moran.mc(x, lw, nsim = 999, zero.policy = TRUE)
+  h <- U[U$year %in% YRS[[p]] & U$acsc, ] |> group_by(province) |> summarise(n = sum(n))
+  pp <- pop[pop$year %in% YRS[[p]], ] |> group_by(province) |> summarise(N = sum(pop))
+  d <- left_join(pp, h, by = "province")[match(geo$province, pp$province), ]
+  set.seed(SEED); eb <- EBImoran.mc(d$n, d$N, lw, nsim = 999, zero.policy = TRUE)
+  tibble(period = p, moran_I = gm_$statistic, p = gm_$p.value, EB_moran_I = eb$statistic, EB_p = eb$p.value)
+}))
+knitr::kable(moran_by_period, digits = 3)
+lisa <- bind_rows(lapply(PER, function(p) {
+  x <- PR[[p]]$asr[match(geo$province, PR[[p]]$province)]
+  set.seed(SEED); lp <- localmoran_perm(x, lw, nsim = 9999, zero.policy = TRUE)
+  pv <- lp[, "Pr(z != E(Ii)) Sim"]; pv[card(geo$nb$queen) == 0] <- NA
+  tibble(period = p, province = geo$province, quadrant = as.character(attr(lp, "quadr")$mean), p = pv, p_fdr = p.adjust(pv, "BH"))
+}))
+lisa |> filter(p < 0.05) |> mutate(name = PNAME[as.integer(province)])
+```
+
+Morona Santiago is high-high in 2015–2019 and 2020–2024 and Pastaza in 2008–2014, but none remains significant after correction for multiple testing.
+
+## Figure 2
+
+```{r figure2, fig.height = 7.5}
+pp4 <- bind_rows(lapply(PER, function(p) mutate(PR[[p]], period = p)))
+br <- quantile(pp4$asr, 0:5 / 5); br[c(1, 6)] <- br[c(1, 6)] + c(-1, 1)
+mp <- merge(g, pp4, by = "province") |> mutate(q = cut(asr, br, include.lowest = TRUE, dig.lab = 5))
+hh <- lisa |> filter(p < 0.05, quadrant == "High-High")
+ggplot(mp) + geom_sf(aes(fill = q), colour = "grey35", linewidth = 0.12) +
+  geom_sf(data = merge(g, hh, by = "province"), fill = NA, colour = "black", linewidth = 0.6) +
+  facet_wrap(~ period, ncol = 2) + scale_fill_brewer(palette = "YlOrRd", name = "Rate per 100,000") +
+  ggspatial::annotation_scale(data = data.frame(period = PER[1]), location = "bl", width_hint = 0.3) +
+  ggspatial::annotation_north_arrow(data = data.frame(period = PER[1]), location = "br", height = unit(6, "mm"), width = unit(4.5, "mm")) +
+  labs(caption = "Galápagos shown 7° east of its true position. Sources: INEC; boundaries ADM1 2024.") +
+  theme_void() + theme(legend.position = "bottom")
+```
+
+# Step 10. Hospital beds
+
+## Reading the bed series
+
+Beds by province come from two INEC sources: the published historical series for 2004–2024 (sheet 1.5.2, available beds; sheet 1.5.3, beds of normal allocation) and the establishment files for 2000–2003, which we add up by province. In those years Santo Domingo de los Tsáchilas and Santa Elena were still part of Pichincha and Guayas; their beds are split with the shares of 2004.
+
+```{r beds-read}
+PNAME_UP <- c("AZUAY", "BOLIVAR", "CAÑAR", "CARCHI", "COTOPAXI", "CHIMBORAZO", "EL ORO", "ESMERALDAS", "GUAYAS", "IMBABURA",
+              "LOJA", "LOS RIOS", "MANABI", "MORONA SANTIAGO", "NAPO", "PASTAZA", "PICHINCHA", "TUNGURAHUA", "ZAMORA CHINCHIPE",
+              "GALAPAGOS", "SUCUMBIOS", "ORELLANA", "SANTO DOMINGO DE LOS TSACHILAS", "SANTA ELENA")   # as written in the INEC sheets
+read_series <- function(sheet) {
+  x <- readxl::read_excel(params$beds_xlsx, sheet = sheet, col_names = FALSE, .name_repair = "minimal")
+  hdr <- which(x[[1]] == "PROVINCIA")[1]; yrs <- as.integer(unlist(x[hdr, -1])); keep <- !is.na(yrs)
+  rows <- x[trimws(x[[1]]) %in% PNAME_UP, c(TRUE, keep)]
+  tibble(province = sprintf("%02d", match(trimws(rows[[1]]), PNAME_UP)), !!!setNames(lapply(rows[-1], as.numeric), yrs[keep])) |>
+    pivot_longer(-province, names_to = "year", values_to = "beds") |> mutate(year = as.integer(year), beds = round(beds))
+}
+b0424 <- read_series("1.5.2") |> rename(available = beds) |> left_join(read_series("1.5.3") |> rename(normal = beds), by = c("province", "year"))
+core <- c("MEDIC", "CIRUG", "GINOB", "PEDIA", "CARDI", "NEUMO", "PSIQU", "TRAUM", "INFEC", "OFTAL", "UROLO", "GASTR", "OTRSE", "SERIN")
+read_beds_year <- function(y) {
+  if (y == 2000) {
+    d <- foreign::read.dbf(file.path(params$beds_raw_dir, "2000", "ech2000w.dbf"), as.is = TRUE)
+    names(d) <- c("CODESTAD", "ANIESTAD", "PROUBIES", "CLAESTSA", "TIPESTSA", "ENTESTSA", "SECESTSA", paste0("DOT", core),
+                  paste0("DIS", core), "TOTCAMDO", "TOTCAMDI", "DIADISPO", "DIAHOSPI", "FALMEN48", "FALMAS48", "TOTEGRES")
+  } else d <- as.data.frame(haven::zap_labels(haven::read_sav(list.files(file.path(params$beds_raw_dir, y), "[.]sav$", recursive = TRUE, full.names = TRUE)[1])))
+  tibble(year = y, prov = d$PROUBIES, available = as.numeric(d$TOTCAMDI),
+         normal = rowSums(sapply(paste0("DOT", core), function(v) as.numeric(d[[v]]))))
+}
+raw0003 <- bind_rows(lapply(2000:2003, read_beds_year))
+raw0003 |> group_by(year) |> summarise(available = sum(available))      # equals INEC national totals
+s04 <- b0424 |> filter(year == 2004)
+sh <- function(child, parent, v) s04[[v]][s04$province == child] / sum(s04[[v]][s04$province %in% c(child, parent)])
+b0003 <- bind_rows(lapply(2000:2003, function(y) {
+  x <- raw0003 |> filter(year == y, prov %in% sprintf("%02d", 1:22)) |> group_by(province = prov) |>
+    summarise(available = sum(available), normal = sum(normal))
+  out <- tibble(year = y, province = c(x$province, "23", "24"))
+  for (v in c("available", "normal")) {
+    val <- setNames(x[[v]], x$province); s23 <- sh("23", "17", v); s24 <- sh("24", "09", v)
+    val["23"] <- val["17"] * s23; val["17"] <- val["17"] * (1 - s23)      # Santo Domingo out of Pichincha
+    val["24"] <- val["09"] * s24; val["09"] <- val["09"] * (1 - s24)      # Santa Elena out of Guayas
+    out[[v]] <- round(unname(val[out$province]))
+  }
+  out
+}))
+beds <- bind_rows(b0003, b0424) |> arrange(province, year)
+```
+
+## Cleaning registration errors
+
+Some provincial values are clearly wrong for a single year or two (Manabí had 3,635 beds in 2008 against about 1,400–1,800 around it; Galápagos had 0 beds in 2003 and 2008). A five-year running median, repeated until it no longer changes, removes such spikes and keeps real changes that last three years or more.
+
+```{r beds-smooth, fig.height = 3.5}
+smooth5 <- function(b) { x <- b; repeat { nx <- as.numeric(runmed(x, 5, endrule = "median")); if (all(nx == x)) break; x <- nx }; x }
+beds <- beds |> group_by(province) |> mutate(available_s = smooth5(available), normal_s = smooth5(normal)) |> ungroup() |>
+  left_join(pop |> group_by(year, province) |> summarise(pop = sum(pop)), by = c("year", "province")) |>
+  mutate(b10k = available_s / pop * 1e4, changed = available_s > 1.25 * available | available_s < available / 1.25 | available == 0)
+sum(beds$changed)
+ggplot(filter(beds, province == "13"), aes(year)) + geom_line(aes(y = available, colour = "reported")) +
+  geom_line(aes(y = available_s, colour = "smoothed")) + labs(y = "Beds, Manabí", x = NULL, colour = NULL) + theme_classic()
+```
+
+## Do beds explain ACSC hospitalizations?
+
+Within each province, we ask whether years with more beds per inhabitant had more hospitalizations, after removing everything constant in a province (province fixed effects) and everything common to all provinces in a year (year fixed effects). The outcome is the observed count with the expected count (age-sex standardization) as offset, so the coefficient refers to standardized rates. Standard errors are clustered by province.
+
+```{r beds-models}
+panel_of <- function(grp, basis = "res") {
+  x <- annual |> filter(geo == basis, group %in% grp) |> usable() |> mutate(b = band(age))
+  pp <- pop |> mutate(b = band(age))
+  ref <- x |> group_by(b, sex) |> summarise(n = sum(n)) |> left_join(pp |> group_by(b, sex) |> summarise(N = sum(pop)), by = c("b", "sex"))
+  pp |> group_by(year, province, b, sex) |> summarise(N = sum(pop)) |> left_join(transmute(ref, b, sex, r = n / N), by = c("b", "sex")) |>
+    group_by(year, province) |> summarise(expected = sum(N * r)) |>
+    left_join(x |> group_by(year, province) |> summarise(observed = sum(n)), by = c("year", "province")) |>
+    mutate(observed = coalesce(observed, 0)) |> left_join(beds, by = c("year", "province"))
+}
+fe_beds <- function(d, offset = "expected") {
+  m <- glm(observed ~ log(b10k) + factor(province) + factor(year) + offset(log(d[[offset]])), family = quasipoisson(), data = d)
+  V <- vcovCL(m, cluster = d$province); b <- unname(coef(m)["log(b10k)"]); s <- sqrt(V["log(b10k)", "log(b10k)"])
+  c(pct_per_10pct_beds = 100 * (1.1^b - 1), lcl = 100 * (1.1^(b - 1.96 * s) - 1), ucl = 100 * (1.1^(b + 1.96 * s) - 1), beta = unname(b))
+}
+p_acsc <- panel_of(1:20); p_non <- panel_of(c(0, 99))
+p_share <- p_acsc |> left_join(p_non |> select(year, province, other = observed), by = c("year", "province")) |> mutate(all = observed + other)
+bed_models <- rbind(ACSC = fe_beds(p_acsc), `Non-ACSC` = fe_beds(p_non), `ACSC share` = fe_beds(p_share, "all"))
+round(bed_models, 2)
+```
+
+Ten percent more beds came with 4.5% more ACSC hospitalizations and 4.8% more other hospitalizations: hospital use in general follows bed supply, and the ACSC share does not.
+
+```{r beds-contribution}
+ch <- p_acsc |> filter(year %in% c(2011, 2024)) |> select(year, province, b10k, observed, expected) |>
+  pivot_wider(names_from = year, values_from = c(b10k, observed, expected))
+c(attributable_to_beds = 100 * (sum(ch$observed_2024) / sum(ch$observed_2024 * (ch$b10k_2011 / ch$b10k_2024)^bed_models[1, "beta"]) - 1),
+  observed_change = 100 * ((sum(ch$observed_2024) / sum(ch$expected_2024)) / (sum(ch$observed_2011) / sum(ch$expected_2011)) - 1))
+```
+
+# Step 11. Sensitivity analyses
+
+The article reports several checks. Two examples:
+
+```{r sensitivity}
+# WHO world standard instead of Ecuador 2022
+nat_who |> filter(year %in% c(2000, 2011, 2024)) |> select(year, asr)
+# without group 10 (genitourinary infection in pregnancy)
+no10 <- rate_series(function(d) d$acsc & d$group != 10)
+jp_fit(no10$year, no10$asr, no10$se, jp_select(no10$year, no10$asr, no10$se)$knots)$segments
+```
+
+# Step 12. Saving the tables
+
+```{r save}
+readr::write_csv(nat, file.path(OUT, "national_rates.csv"))
+readr::write_csv(table2, file.path(OUT, "table2_joinpoint.csv"))
+readr::write_csv(variation, file.path(OUT, "provincial_variation.csv"))
+readr::write_csv(as.data.frame(bed_models) |> tibble::rownames_to_column("model"), file.path(OUT, "bed_models.csv"))
+list.files(OUT)
+```
+
+```{r compare, eval = nzchar(params$repo_results)}
+# Optional: compare with the results of the repository's analysis script
+r <- readr::read_csv(file.path(params$repo_results, "nat_total.csv"), show_col_types = FALSE)
+max(abs(r$asr - nat$asr))
+```
+
+# Session
+
+```{r session}
+sessionInfo()
+```
