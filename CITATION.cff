@@ -5,12 +5,14 @@ type: dataset
 authors:
   - family-names: Martínez-Abarca
     given-names: Ana Lucía
-    affiliation: "Universidad de Almería, Research Group CTS-1127 Epidemiology and Public Health"
+    affiliation: "Universidad de Almería"
   - family-names: Henríquez-Trujillo
     given-names: Maria Carolina
     affiliation: "Instituto Ecuatoriano de Seguridad Social, Hospital General San Francisco de Quito"
   - family-names: Bonilla
-    given-names: Esteban
+    given-names: J. Esteban
+    affiliation: "Texas A&M University, School of Public Health"
+    orcid: "https://orcid.org/0009-0000-2254-0356"
   - family-names: Henríquez-Trujillo
     given-names: Aquiles Rodrigo
     affiliation: "Institute of Tropical Medicine, Antwerp"
@@ -23,8 +25,8 @@ identifiers:
 repository-code: "https://github.com/rhenriquezitg/acsc_ecuador"
 url: "https://github.com/rhenriquezitg/acsc_ecuador"
 license: CC-BY-4.0
-date-released: 2026-10-14
-version: 1.0.0
+date-released: 2026-11-02
+version: 1.1.0
 keywords:
   - ambulatory care sensitive conditions
   - primary health care

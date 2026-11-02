@@ -112,7 +112,7 @@ PROVS <- REGION_TAB$province
 SEX_LAB <- c("1" = "Hombre", "2" = "Mujer")
 CATEGORIES <- c("Chronic", "Infectious", "Vaccine-preventable", "Other acute")
 REGIONS <- c("Costa", "Sierra", "Amazon\u00eda", "Gal\u00e1pagos")
-DELIVERY <- "O80-O84"     # deliveries: removed from the denominator in the "excluding deliveries" share
+DELIVERY <- "O80-O84"     # deliveries: reported separately (non-ACSC); all shares use all discharges as denominator
 GROUP_DELIVERY <- 99L     # group code given to delivery records (non-ACSC)
 
 # Three-character categories of which only some subcategories are ACSC (e.g. J18 when
@@ -464,17 +464,36 @@ variation_indicators <- function(asr, exp_tab) {
              value = c(length(asr), min(asr), max(asr), max(asr) / min(asr), 100 * stats::sd(asr) / mean(asr), scv))
 }
 
+# Empirical Bayes Moran's I (Assuncao and Reis 1999) on counts and populations, which accounts for
+# the instability of rates in provinces with small populations.
+eb_moran <- function(cnt, pop, geo_obj, nsim = 999, seed = SEED) {
+  n <- rate_records(cnt) |> group_by(province) |> summarise(n = sum(n), .groups = "drop")
+  d <- pop |> filter(province %in% PROVS) |> group_by(province) |> summarise(pop = sum(pop), .groups = "drop") |>
+    left_join(n, by = "province")
+  d$n[is.na(d$n)] <- 0; d <- d[match(geo_obj$province, d$province), ]
+  set.seed(seed)
+  e <- spdep::EBImoran.mc(d$n, d$pop, spdep::nb2listw(geo_obj$nb$queen, style = "W", zero.policy = TRUE),
+                          nsim = nsim, zero.policy = TRUE)
+  data.frame(statistic = "Empirical Bayes Moran's I", value = unname(e$statistic), p_value = e$p.value,
+             nsim = nsim, neighbours = "queen, empirical Bayes")
+}
+
 moran_analysis <- function(values, geo_obj, nb_type = "queen", nsim = 999, seed = SEED) {
   nb <- geo_obj$nb[[nb_type]]
   lw <- spdep::nb2listw(nb, style = "W", zero.policy = TRUE)
   set.seed(seed)
   gm <- spdep::moran.mc(values, lw, nsim = nsim, zero.policy = TRUE)
-  lm <- spdep::localmoran(values, lw, zero.policy = TRUE)
-  q <- as.character(attr(lm, "quadr")$mean); p <- lm[, 5]
-  cl <- ifelse(spdep::card(nb) == 0, "No neighbours", ifelse(p < 0.05, q, "Not significant"))
+  # Local Moran's I (LISA) with conditional permutation p-values (9,999 permutations); clusters are
+  # flagged at p < 0.05 without correction (exploratory) and Benjamini-Hochberg FDR p-values are kept.
+  set.seed(seed)
+  lm <- spdep::localmoran_perm(values, lw, nsim = 9999, zero.policy = TRUE)
+  q <- as.character(attr(lm, "quadr")$mean); p <- lm[, "Pr(z != E(Ii)) Sim"]
+  no_nb <- spdep::card(nb) == 0; p[no_nb] <- NA
+  p_fdr <- stats::p.adjust(p, "BH")
+  cl <- ifelse(no_nb, "No neighbours", ifelse(p < 0.05, q, "Not significant"))
   list(global = data.frame(statistic = "Global Moran's I", value = unname(gm$statistic), p_value = gm$p.value,
                            nsim = nsim, neighbours = nb_type),
-       local = data.frame(province = geo_obj$province, Ii = lm[, 1], p = p, cluster = cl))
+       local = data.frame(province = geo_obj$province, Ii = lm[, 1], p = p, p_fdr = p_fdr, cluster = cl))
 }
 
 # 2.6 Helpers for the results layer -------------------------------------------
@@ -559,6 +578,18 @@ if (REBUILD_FROM_MICRODATA) {
   readr::write_csv(ref[ref$code %in% codes, ], file.path(DATA, "icd10_labels.csv"))
   saveRDS(prepare_geometry(SHAPEFILE), file.path(DATA, "provinces_geo.rds"))
   rm(agg)
+}
+
+# Discharges coded as COVID-19 (U07-U10), pneumonia (J12-J18) and the ACSC pneumonia codes (J13, J14,
+# J15.9, J18.1), 2019-2024 (data/covid_codes_2019_2024.csv).
+if (REBUILD_FROM_MICRODATA) {
+  cc <- inectab::open_cache(CACHE_DIR) |> filter(.data$dataset == "egresos", .data$event_year >= 2019) |>
+    select("event_year", "icd10") |> collect()
+  cc$c3 <- substr(cc$icd10, 1, 3)
+  readr::write_csv(cc |> group_by(year = event_year) |>
+                     summarise(u07_u10 = sum(c3 %in% c("U07", "U09", "U10")), j12_j18 = sum(c3 %in% sprintf("J%02d", 12:18)),
+                               acsc_pneumonia_codes = sum(icd10 %in% c("J13", "J14", "J159", "J181")), all_discharges = n()),
+                   file.path(DATA, "covid_codes_2019_2024.csv"))
 }
 
 # Provincial beds 2000-2003 from the INEC establishment-level files; 2004-2024 come from the
@@ -716,9 +747,8 @@ collect_jp <- function(excl, tag) {
   for (sx in c("1", "2")) res[[length(res) + 1]] <- jp_run(nsex[nsex$sex == sx, ], SEX_LAB[[sx]], excl)
   for (cc in CATEGORIES) res[[length(res) + 1]] <- jp_run(ncat[ncat$category == cc, ], cc, excl)
   for (g in GROUPS$group) res[[length(res) + 1]] <- jp_run(ngrp[ngrp$group == g, ], GROUPS$label[GROUPS$group == g], excl, nperm = 999)
-  # ACSC share of hospitalizations excluding deliveries; binomial standard error
-  sh <- ann |> transmute(year, asr = 100 * acsc / (all - deliv),
-                         asr_se = 100 * sqrt((acsc / (all - deliv)) * (1 - acsc / (all - deliv)) / (all - deliv)))
+  # ACSC share of all hospitalizations (population-wide denominator); binomial standard error
+  sh <- ann |> transmute(year, asr = 100 * acsc / all, asr_se = 100 * sqrt((acsc / all) * (1 - acsc / all) / all))
   res[[length(res) + 1]] <- jp_run(sh, "Share of hospitalizations", excl)
   write_res(bind_rows(lapply(res, `[[`, "segments")), paste0("jp_segments", tag))
   write_res(bind_rows(lapply(res, `[[`, "aapc")), paste0("jp_aapc", tag))
@@ -736,12 +766,12 @@ monthly_all <- function(years, grp) {
   m <- dat$monthly; m <- m[m$year %in% years & m$group %in% grp, ]
   summarise(group_by(m, .data$year, .data$month), n = sum(.data$n), .groups = "drop")
 }
-# offset "pop": population (rates); offset "hosp": all hospitalizations excluding deliveries (share)
+# offset "pop": population (rates); offset "hosp": all hospitalizations (ACSC share)
 its_run <- function(years, start, grp, label, offset = c("pop", "hosp"), excl = 0L) {
   offset <- match.arg(offset)
   ser <- monthly_all(years, grp)
   pm <- if (offset == "pop") monthly_population(pop |> filter(year %in% years) |> group_by(year) |> summarise(pop = sum(pop)))
-        else (monthly_all(years, c(0L, GROUPS$group)) |> rename(pop = n))[, c("month", "year", "pop")]
+        else (monthly_all(years, c(0L, GROUPS$group, GROUP_DELIVERY)) |> rename(pop = n))[, c("month", "year", "pop")]
   f <- fit_its(its_frame(ser, pm, start = start, k_fourier = 2, exclude_months = excl), 2, 12, 1e5, label)
   f$effects$offset <- offset
   f
@@ -755,7 +785,7 @@ keep_diag <- function(dn, f, offset) data.frame(design = dn, series = f$label, o
                                                 lb = f$ljung_box_p, obs = f$post_observed, exp = f$post_expected)
 for (dn in names(designs)) {
   ds_ <- designs[[dn]]
-  sers <- c(list(`All ACSC` = GROUPS$group), CATG, list(`Non-ACSC (excluding deliveries)` = 0L))
+  sers <- c(list(`All ACSC` = GROUPS$group), CATG, list(`Non-ACSC` = c(0L, GROUP_DELIVERY)))
   for (sn in names(sers)) {
     f <- its_run(ds_$years, ds_$start, sers[[sn]], sn, "pop")
     fits[[paste(dn, sn, "pop")]] <- f
@@ -775,7 +805,11 @@ sens <- list(
   covid_2015  = its_run(2015:2024, c(2020L, 3L), GROUPS$group, "All ACSC, 2015-2024 window"),
   covid_excl3 = its_run(2012:2024, c(2020L, 3L), GROUPS$group, "All ACSC, March-May 2020 left out", excl = 3L),
   reform_2014 = its_run(2000:2014, c(2008L, 1L), GROUPS$group, "All ACSC, 2000-2014 window"),
-  reform_oct  = its_run(2000:2019, c(2008L, 10L), GROUPS$group, "All ACSC, interruption October 2008"))
+  reform_oct  = its_run(2000:2019, c(2008L, 10L), GROUPS$group, "All ACSC, interruption October 2008"),
+  # later interruption: January 2012, adoption of the family, community and intercultural model of care (MAIS)
+  reform_2012 = its_run(2000:2019, c(2012L, 1L), GROUPS$group, "All ACSC, interruption January 2012"),
+  reform_2012_non = its_run(2000:2019, c(2012L, 1L), c(0L, GROUP_DELIVERY), "Non-ACSC, interruption January 2012"),
+  reform_2012_share = its_run(2000:2019, c(2012L, 1L), GROUPS$group, "ACSC share, interruption January 2012", "hosp"))
 write_res(bind_rows(lapply(names(sens), function(k) cbind(sensitivity = k, sens[[k]]$effects))), "its_sensitivity")
 
 
@@ -786,8 +820,9 @@ prov_period <- function(p) {
   sp <- s; sp$years <- if (p == "Total") s$years else s$years[period_of(s$years) == p]
   pa <- province_analysis(a[a$year %in% sp$years, ], pop[pop$year %in% sp$years, ], sp, geo)
   mk <- moran_analysis(pa$table$asr[match(geo$province, pa$table$province)], geo, "knn4")$global   # k = 4 nearest neighbours
+  eb <- eb_moran(a[a$year %in% sp$years & a$hecsap, ], pop[pop$year %in% sp$years, ], geo)
   list(table = cbind(period = p, pa$table), variation = cbind(period = p, pa$variation),
-       moran = cbind(period = p, rbind(pa$moran, mk)))
+       moran = cbind(period = p, rbind(pa$moran, mk, eb)))
 }
 pp_all <- lapply(c(names(PER), "Total"), prov_period)
 write_res(bind_rows(lapply(pp_all, `[[`, "table")), "prov_period")
@@ -882,14 +917,14 @@ bn <- readr::read_csv(file.path(DATA, "beds_national.csv"), show_col_types = FAL
 write_res(bn, "beds_national")
 
 # Province-year counts and expected counts (indirect age-sex standardization to the
-# 2004-2024 national rates of each outcome). Outcomes: ACSC, non-ACSC excluding deliveries.
+# national rates of each outcome). Outcomes: ACSC and all other (non-ACSC) hospitalizations.
 province_year_panel <- function(geo_basis = "res") {
   sp <- s; sp$geo <- geo_basis; sp$years <- BED_YEARS
   aa <- rate_records(prep_annual(dat, sp))
   pp <- pop[pop$year %in% BED_YEARS, ]
   out <- list()
   for (o in c("acsc", "nonacsc")) {
-    x <- if (o == "acsc") aa[aa$hecsap, ] else aa[aa$group == 0L, ]
+    x <- if (o == "acsc") aa[aa$hecsap, ] else aa[aa$group %in% c(0L, GROUP_DELIVERY), ]
     x$age_band <- as.character(band_of(x$age, bands)); pp$age_band <- as.character(band_of(pp$age, bands))
     ref <- left_join(summarise(group_by(x, age_band, sex), n = sum(n), .groups = "drop"),
                      summarise(group_by(pp, age_band, sex), pop = sum(pop), .groups = "drop"), by = c("age_band", "sex"))
@@ -907,7 +942,7 @@ panel_occ <- province_year_panel("occ")
 write_res(panel, "beds_panel")
 
 # Fixed-effects quasi-Poisson models: log E[y_pt] = a_p + g_t + b * log(beds per 10,000_pt) + log(offset_pt).
-# Offsets: expected counts (rates) or all non-delivery hospitalizations (ACSC share).
+# Offsets: expected counts (rates) or all hospitalizations (ACSC share).
 # Standard errors clustered by province. Effect reported per 10% more beds (elasticity).
 fe_model <- function(d, xvar = "b10k", offset = "expected", label = "", lag = 0) {
   d <- d[order(d$province, d$year), ]
@@ -922,12 +957,12 @@ fe_model <- function(d, xvar = "b10k", offset = "expected", label = "", lag = 0)
 }
 acsc_p <- panel[panel$outcome == "acsc", ]; non_p <- panel[panel$outcome == "nonacsc", ]
 share_p <- acsc_p |> left_join(non_p |> transmute(year, province, other = observed), by = c("year", "province")) |>
-  mutate(all_nodeliv = observed + other)
+  mutate(all_hosp = observed + other)
 occ_p <- panel_occ[panel_occ$outcome == "acsc", ]
 bed_models <- bind_rows(
   fe_model(acsc_p, label = "ACSC hospitalization rate"),
-  fe_model(non_p, label = "Non-ACSC hospitalization rate (excluding deliveries)"),
-  fe_model(share_p, offset = "all_nodeliv", label = "ACSC share of hospitalizations"),
+  fe_model(non_p, label = "Non-ACSC hospitalization rate"),
+  fe_model(share_p, offset = "all_hosp", label = "ACSC share of hospitalizations"),
   fe_model(acsc_p, "b10k_raw", label = "ACSC rate, reported bed counts"),
   fe_model(acsc_p, "b10k_normal", label = "ACSC rate, beds of normal allocation"),
   fe_model(acsc_p, lag = 1, label = "ACSC rate, beds lagged one year"),
@@ -935,7 +970,7 @@ bed_models <- bind_rows(
   fe_model(acsc_p[acsc_p$year >= 2004, ], label = "ACSC rate, 2004-2024 (published provincial series)"),
   fe_model(acsc_p[!(acsc_p$year <= 2003 & acsc_p$province %in% c("09", "17", "23", "24")), ], label = "ACSC rate, split provinces left out in 2000-2003"),
   fe_model(occ_p, label = "ACSC rate by province of the hospital"),
-  fe_model(share_p, "b10k_raw", offset = "all_nodeliv", label = "ACSC share, reported bed counts"))
+  fe_model(share_p, "b10k_raw", offset = "all_hosp", label = "ACSC share, reported bed counts"))
 write_res(bed_models, "beds_models")
 
 # Between-province association: provincial ASR and beds per 10,000 by period (Spearman),
@@ -1008,11 +1043,10 @@ pA <- ggplot(d2, aes(year, asr, colour = series)) + REF + geom_line(data = ft, a
   scale_colour_manual(values = SEX_COL, name = NULL) + YRS + scale_y_continuous(labels = scales::label_comma(), limits = c(450, NA)) +
   labs(x = NULL, y = "Age-standardized rate per 100,000")
 d1 <- bind_rows(annf |> transmute(year, value = share, what = "ACSC, % of all hospitalizations"),
-                annf |> transmute(year, value = share_nodeliv, what = "ACSC, % of hospitalizations excluding deliveries"),
                 annf |> transmute(year, value = disch_per_1000 / 4, what = "All hospitalizations per 1,000 population (right axis)"))
 pB <- ggplot(d1, aes(year, value, colour = what, linetype = what)) + REF + geom_line(linewidth = 0.7) + geom_point(size = 1) +
-  scale_colour_manual(values = c("#1f5f99", "#7fa7cc", "grey30"), name = NULL) +
-  scale_linetype_manual(values = c("solid", "solid", "22"), name = NULL) +
+  scale_colour_manual(values = c("#1f5f99", "grey30"), name = NULL) +
+  scale_linetype_manual(values = c("solid", "22"), name = NULL) +
   scale_y_continuous(name = "% of hospitalizations", limits = c(0, 25), sec.axis = sec_axis(~ . * 4, name = "Hospitalizations per 1,000")) +
   YRS + guides(colour = guide_legend(ncol = 1), linetype = guide_legend(ncol = 1)) + labs(x = NULL)
 save_fig(pA / pB + plot_annotation(tag_levels = "A"), "Figure1", 7, 8)
@@ -1028,12 +1062,24 @@ labs_q <- paste0(formatC(round(br[-6]), format = "d", big.mark = ","), "\u2013",
 gm4 <- merge(g, pp4, by = "province")
 gm4$q <- cut(gm4$asr, br, labels = labs_q, include.lowest = TRUE)
 mtheme <- theme(axis.text = element_blank(), axis.ticks = element_blank(), axis.line = element_blank(), axis.title = element_blank(),
-                legend.position = "bottom", legend.key.size = unit(3.5, "mm"))
+                legend.position = "bottom", legend.key.size = unit(3.5, "mm"),
+                plot.caption = element_text(size = 6.5, hjust = 0, colour = "grey30"), plot.caption.position = "plot",
+                panel.spacing = unit(1.2, "lines"))
+MAP_SOURCE <- paste0("Galápagos is shown 7° east of its true position. Sources: INEC, Registro Estadístico de Camas y Egresos\n",
+                     "Hospitalarios 2000–2024, and population projections (revision 2024); provincial boundaries ADM1 2024.")
+first_panel <- data.frame(period = names(PER)[1])
+map_extras <- list(
+  ggspatial::annotation_scale(data = first_panel, location = "bl", width_hint = 0.3, text_cex = 0.55,
+                              height = unit(1.2, "mm"), pad_y = unit(1, "mm")),
+  ggspatial::annotation_north_arrow(data = first_panel, location = "br", height = unit(6, "mm"), width = unit(4.5, "mm"),
+                                    pad_y = unit(1, "mm"), style = ggspatial::north_arrow_orienteering(text_size = 5)),
+  labs(caption = MAP_SOURCE))
 f2 <- ggplot(gm4) + geom_sf(aes(fill = q), colour = "grey35", linewidth = 0.12) +
   geom_sf(data = gm4[gm4$cluster == "High-High", ], fill = NA, colour = "black", linewidth = 0.6) +
   facet_wrap(~ period, ncol = 2) + coord_sf(expand = FALSE) +
-  scale_fill_brewer(palette = "YlOrRd", name = "ASR per 100,000") + guides(fill = guide_legend(nrow = 1)) + mtheme
-save_fig(f2, "Figure2", 7.5, 7.5)
+  scale_fill_brewer(palette = "YlOrRd", name = "Age-standardized rate per 100,000") + guides(fill = guide_legend(nrow = 1)) +
+  map_extras + mtheme
+save_fig(f2, "Figure2", 7.5, 7.7)
 
 # Figure S1. Rates by condition category with joinpoint models.
 fc <- jpf |> filter(series %in% names(CAT_EN)) |> mutate(cat = factor(CAT_EN[series], CAT_EN))
@@ -1082,7 +1128,7 @@ its_panel <- function(f, title, ylab = "Hospitalizations per 100,000 per month",
 fs4 <- (its_panel(fits[["reform All ACSC pop"]], "2008 reform: ACSC hospitalizations") |
         its_panel(fits[["reform share"]], "2008 reform: ACSC share of hospitalizations", "ACSC, % of hospitalizations", 1e-3)) /
        (its_panel(fits[["covid All ACSC pop"]], "COVID-19: ACSC hospitalizations") |
-        its_panel(fits[["covid Non-ACSC (excluding deliveries) pop"]], "COVID-19: non-ACSC hospitalizations")) +
+        its_panel(fits[["covid Non-ACSC pop"]], "COVID-19: non-ACSC hospitalizations")) +
   plot_annotation(tag_levels = "A") + plot_layout(guides = "collect") & theme(legend.position = "bottom")
 save_fig(fs4, "FigureS4", 7.5, 7)
 
@@ -1111,8 +1157,23 @@ LISA_COL <- c("High-High" = "#c0392b", "Low-Low" = "#2471a3", "High-Low" = "#f19
               "Not significant" = "#e5e5e5", "No neighbours" = "#ffffff")
 gm4$cluster <- factor(gm4$cluster, names(LISA_COL))
 fs7 <- ggplot(gm4) + geom_sf(aes(fill = cluster), colour = "grey35", linewidth = 0.12) + facet_wrap(~ period, ncol = 2) +
-  coord_sf(expand = FALSE) + scale_fill_manual(values = LISA_COL, name = "Local Moran's I", drop = FALSE) + mtheme
-save_fig(fs7, "FigureS7", 7.5, 7.5)
+  coord_sf(expand = FALSE) + scale_fill_manual(values = LISA_COL, name = "Local Moran's I", drop = FALSE) + map_extras + mtheme
+save_fig(fs7, "FigureS7", 7.5, 7.7)
+
+# Figure S9. Reference map of provinces and regions.
+REG_COL <- c("Costa" = "#d9ead3", "Sierra" = "#f4e3c1", "Amazon\u00eda" = "#cfe2f3", "Gal\u00e1pagos" = "#ead1dc")
+gref <- merge(g, REGION_TAB, by = "province")
+fs9 <- ggplot(gref) + geom_sf(aes(fill = region), colour = "grey35", linewidth = 0.2) +
+  ggrepel::geom_text_repel(aes(label = province_name, geometry = geometry), stat = "sf_coordinates", size = 2.3,
+                           min.segment.length = 0, segment.colour = "grey40", segment.size = 0.2, seed = SEED, max.overlaps = 50) +
+  scale_fill_manual(values = REG_COL, labels = c("Costa" = "Coast", "Sierra" = "Highlands", "Amazon\u00eda" = "Amazon",
+                                                 "Gal\u00e1pagos" = "Gal\u00e1pagos"), name = NULL) +
+  coord_sf(expand = FALSE) +
+  ggspatial::annotation_scale(location = "bl", width_hint = 0.25, text_cex = 0.6, height = unit(1.5, "mm")) +
+  ggspatial::annotation_north_arrow(location = "br", height = unit(8, "mm"), width = unit(6, "mm"),
+                                    style = ggspatial::north_arrow_orienteering(text_size = 6)) +
+  labs(caption = "Galápagos is shown 7° east of its true position. Provincial boundaries ADM1 2024.") + mtheme
+save_fig(fs9, "FigureS9", 7, 6.5)
 
 # Figure S8. Hospital beds per 10,000 population by province (2000 and 2024) and provincial
 # ACSC rates against bed supply by period.
