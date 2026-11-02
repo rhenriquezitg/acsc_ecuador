@@ -42,6 +42,20 @@ To run it:
 
 The numbers obtained here are the ones in the article. The repository <https://github.com/rhenriquezitg/acsc_ecuador> contains the same analysis as a single script (`acsc_ecuador_analysis.R`) and an independent audit (`acsc_ecuador_audit.R`).
 
+**What the document produces.** Every table and figure of the article and its supplement:
+
+| Output | Section |
+|---|---|
+| Table 1 | Steps 5 and 6 |
+| Table 2, Figure 1, Supplementary Table S4, Figures S1 and S2 | Step 7 |
+| Table 3, Supplementary Tables S5 and S6 (segmented regression), Figure S4 | Step 8 |
+| Supplementary Tables S1 and S3, Figure S5 | Step 6 |
+| Supplementary Tables S2, S7 and S8, Figures 2, S3, S6, S7 and S9 | Step 9 |
+| Supplementary Table S9, Figure S8 | Step 10 |
+| Supplementary Table S6 (sensitivity analyses) and Table S10 | Steps 11 and 5 |
+
+All tables are saved as CSV files and in one Excel workbook, and all figures as TIFF (300 dpi) and PNG files, in `out_dir` (Step 12).
+
 **What you need**
 
 * R 4.2 or later and the packages loaded below.
@@ -273,6 +287,34 @@ res |> filter(acsc) |> group_by(group) |> summarise(n = sum(n)) |> mutate(pct = 
   left_join(GROUPS[, c("group", "name")], by = "group") |> arrange(-n) |> head(4)
 ```
 
+## Composition of ACSC hospitalizations by period
+
+The rest of Table 1 describes who was hospitalized: the percentage of ACSC hospitalizations by sex, age group, condition category and region of residence, in each period.
+
+```{r table1-composition}
+REGION <- c("Sierra", "Sierra", "Sierra", "Sierra", "Sierra", "Sierra", "Costa", "Costa", "Costa", "Sierra", "Sierra", "Costa",
+            "Costa", "Amazonía", "Amazonía", "Amazonía", "Sierra", "Sierra", "Amazonía", "Galápagos", "Amazonía", "Amazonía",
+            "Costa", "Costa")
+h <- res |> filter(acsc) |> mutate(period = period_of(year),
+  sex_l = c("1" = "Men", "2" = "Women")[sex],
+  age_g = cut(age, c(-1, 4, 14, 64, 200), labels = c("0–4", "5–14", "15–64", "65+")),
+  region = ifelse(province %in% PROVS, REGION[match(province, PROVS)], "Abroad or non-delimited zone"))
+composition <- function(var) {
+  by_p <- h |> group_by(period, value = .data[[var]]) |> summarise(n = sum(n)) |> group_by(period) |> mutate(pct = 100 * n / sum(n))
+  tot <- h |> group_by(value = .data[[var]]) |> summarise(n = sum(n)) |> mutate(pct = 100 * n / sum(n), period = "2000–2024")
+  bind_rows(by_p, tot) |> select(-n) |> pivot_wider(names_from = period, values_from = pct) |> mutate(variable = var, .before = 1)
+}
+table1_composition <- bind_rows(lapply(c("sex_l", "age_g", "category", "region"), composition)) |> filter(!is.na(value))
+knitr::kable(table1_composition, digits = 1)
+```
+
+## Annual series (Supplementary Table S10)
+
+```{r tableS10}
+tableS10 <- ann |> select(year, all, acsc, share, per_1000)
+knitr::kable(tableS10, digits = 1, format.args = list(big.mark = ","))
+```
+
 # Step 6. Age-standardized rates
 
 ## The calculation, by hand, for one year
@@ -320,6 +362,81 @@ grps <- lapply(setNames(1:20, GROUPS$label), function(g) rate_series(function(d)
 nat_who <- rate_series(w = W_who)
 ```
 
+## Rates by period (Table 1, last rows)
+
+For a period, the counts and the populations of all its years are added up before standardizing, which gives a rate per 100,000 person-years.
+
+```{r period-rates}
+YRS <- setNames(c(lapply(PER, function(p) (2000:2024)[period_of(2000:2024) == p]), list(2000:2024)), c(PER, "2000–2024"))
+period_rate <- function(sel = function(d) d$acsc, popsel = function(p) p, w = W) bind_rows(lapply(names(YRS), function(p)
+  asr_of(U[U$year %in% YRS[[p]] & sel(U), ], popsel(pop[pop$year %in% YRS[[p]], ]), w) |> mutate(period = p, .before = 1)))
+crude <- function(sel_age = function(a) TRUE, sx = c("1", "2")) sapply(names(YRS), function(p) {
+  x <- U[U$year %in% YRS[[p]] & U$acsc & U$sex %in% sx & sel_age(U$age), ]
+  q <- pop[pop$year %in% YRS[[p]] & pop$sex %in% sx & sel_age(pop$age), ]
+  sum(x$n) / sum(q$pop) * 1e5 })
+table1_rates <- rbind(
+  `Crude rate, all` = crude(), `Crude rate, men` = crude(sx = "1"), `Crude rate, women` = crude(sx = "2"),
+  `Crude rate, 0–4` = crude(function(a) a < 5), `Crude rate, 5–14` = crude(function(a) a >= 5 & a < 15),
+  `Crude rate, 15–64` = crude(function(a) a >= 15 & a < 65), `Crude rate, 65+` = crude(function(a) a >= 65),
+  `Age-standardized rate` = period_rate()$asr, `95% CI, lower` = period_rate()$lcl, `95% CI, upper` = period_rate()$ucl)
+knitr::kable(table1_rates, digits = 1)
+```
+
+## Codes and rates by group (Supplementary Table S1)
+
+```{r tableS1}
+tableS1 <- bind_rows(lapply(1:20, function(g) {
+  r <- period_rate(function(d) d$group == g)
+  tibble(group = g, condition = GROUPS$name[g], icd10 = GROUPS$icd10[g], category = GROUPS$category[g],
+         n = sum(res$n[res$group == g]), pct_acsc = 100 * n / sum(res$n[res$acsc]),
+         !!!setNames(as.list(r$asr[1:4]), paste("ASR", PER)))
+}))
+knitr::kable(tableS1, digits = 1, format.args = list(big.mark = ","))
+```
+
+## Age-specific rates by sex and period (Figure S5)
+
+Age-specific rates are crude rates within 17 five-year age groups (80+ open); they show where the burden lies before any standardization.
+
+```{r figureS5, fig.height = 4.5}
+band17 <- function(age) pmin(age %/% 5, 16)
+lab17 <- c(paste0(seq(0, 75, 5), "–", seq(4, 79, 5)), "80+")
+age_sex_period <- bind_rows(lapply(PER, function(p) {
+  x <- U[U$year %in% YRS[[p]] & U$acsc, ] |> group_by(sex, b = band17(age)) |> summarise(n = sum(n))
+  q <- pop[pop$year %in% YRS[[p]], ] |> group_by(sex, b = band17(age)) |> summarise(N = sum(pop))
+  left_join(q, x, by = c("sex", "b")) |> mutate(period = p, rate = coalesce(n, 0) / N * 1e5)
+})) |> mutate(age_band = factor(lab17[b + 1], lab17), sex = c("1" = "Men", "2" = "Women")[sex])
+PCOL <- setNames(c("#9ecae1", "#4292c6", "#08519c", "#d95f0e"), PER)
+figS5 <- ggplot(age_sex_period, aes(age_band, rate, colour = period, group = period)) + geom_line(linewidth = 0.7) + geom_point(size = 1) +
+  facet_wrap(~ sex) + scale_y_log10(labels = scales::label_comma()) + scale_colour_manual(values = PCOL, name = NULL) +
+  labs(x = "Age group (years)", y = "ACSC hospitalizations per 100,000 (log scale)") + theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 7), legend.position = "bottom")
+figS5
+ratio <- age_sex_period |> filter(age_band %in% c("15–19", "20–24", "25–29", "30–34")) |> group_by(age_band, sex) |>
+  summarise(rate = sum(n) / sum(N)) |> pivot_wider(names_from = sex, values_from = rate) |> mutate(women_to_men = Women / Men)
+ratio
+```
+
+Among women aged 15–34, rates were 2.3 to 3.1 times those among men.
+
+## Leading diagnoses (Supplementary Table S3)
+
+Codes are grouped to three characters, except for the categories that are only partly in the list (for example J15.9), whose four-character codes are kept.
+
+```{r tableS3}
+ref <- icd10_reference()
+top_dx <- function(years) {
+  icd |> filter(year %in% years, !is.na(age), sex %in% c("1", "2")) |>
+    mutate(age_broad = cut(age, c(-1, 14, 64, 200), labels = c("0–14", "15–64", "65+")),
+           code = ifelse(substr(icd10, 1, 3) %in% partial, icd10, substr(icd10, 1, 3))) |>
+    group_by(age_broad, sex, code) |> summarise(n = sum(n)) |> group_by(age_broad, sex) |>
+    mutate(pct = 100 * n / sum(n)) |> slice_max(n, n = 5, with_ties = FALSE) |> mutate(rank = row_number()) |> ungroup() |>
+    mutate(sex = c("1" = "Men", "2" = "Women")[sex], label = ref$label[match(code, ref$code)])
+}
+tableS3 <- top_dx(2000:2024)
+knitr::kable(tableS3 |> select(age_broad, sex, rank, code, label, n, pct), digits = 1)
+```
+
 # Step 7. Joinpoint regression
 
 ## The idea
@@ -341,7 +458,16 @@ jp_fit <- function(year, rate, se, knots) {
   l <- colSums(L * (ends - starts)) / sum(ends - starts); a <- sum(l * b); sa <- sqrt(drop(t(l) %*% V %*% l))
   list(segments = seg, aapc = c(aapc = 100 * (exp(a) - 1), lcl = 100 * (exp(a - tq * sa) - 1), ucl = 100 * (exp(a + tq * sa) - 1),
                                 p = 2 * pt(-abs(a / sa), df)),
-       fitted = exp(drop(X %*% b)), rss = sum(w * f$residuals^2))
+       fitted = exp(drop(X %*% b)), rss = sum(w * f$residuals^2), year = year,
+       parts = list(b = b, V = V, L = L, starts = starts, ends = ends, tq = tq, df = df))
+}
+# AAPC over any sub-period: the slopes of the segments, weighted by the years each covers
+aapc_period <- function(fit, from, to) {
+  with(fit$parts, {
+    wl <- pmax(0, pmin(ends, to) - pmax(starts, from)); l <- colSums(L * wl) / sum(wl)
+    a <- sum(l * b); sa <- sqrt(drop(t(l) %*% V %*% l))
+    c(aapc = 100 * (exp(a) - 1), lcl = 100 * (exp(a - tq * sa) - 1), ucl = 100 * (exp(a + tq * sa) - 1), p = 2 * pt(-abs(a / sa), df))
+  })
 }
 ```
 
@@ -412,6 +538,61 @@ table2 <- bind_rows(lapply(names(JP)[1:8], function(k) JP[[k]]$segments |>
 knitr::kable(table2, digits = c(0, 0, 0, 1, 1, 1, 3, 0))
 ```
 
+## All series, with and without 2020–2021 (Supplementary Table S4)
+
+The pandemic years are unusual, so every model is refitted without 2020 and 2021. The table also gives the AAPC for 2000–2007, 2008–2019 and 2015–2024.
+
+```{r tableS4}
+share <- ann |> transmute(year, asr = share, se = 100 * sqrt((acsc / all) * (1 - acsc / all) / all))
+SERIES <- c(list(`All ACSC` = nat, Men = men, Women = women), cats, list(`ACSC share` = share), grps)
+if (file.exists(saved("joinpoint_excl2021"))) {
+  JP_x <- readRDS(saved("joinpoint_excl2021"))
+} else {
+  JP_x <- lapply(names(SERIES), function(k) {
+    s <- SERIES[[k]]; s <- s[!s$year %in% 2020:2021 & s$asr > 0, ]
+    sl <- jp_select(s$year, s$asr, s$se, nperm = if (k %in% GROUPS$label) 999 else params$nperm); jp_fit(s$year, s$asr, s$se, sl$knots)
+  }); names(JP_x) <- names(SERIES); saveRDS(JP_x, saved("joinpoint_excl2021"))
+}
+seg_text <- function(f) paste(sprintf("%d–%d: %.1f (%.1f to %.1f)", f$segments$start, f$segments$end, f$segments$apc, f$segments$lcl, f$segments$ucl), collapse = "; ")
+aapc_text <- function(f, a, b) { x <- aapc_period(f, a, b); sprintf("%.1f (%.1f to %.1f)", x[1], x[2], x[3]) }
+tableS4 <- bind_rows(lapply(c("All years", "2020 and 2021 left out"), function(an) {
+  L <- if (an == "All years") JP else JP_x
+  bind_rows(lapply(names(SERIES), function(k) tibble(analysis = an, series = k, segments = seg_text(L[[k]]),
+    `AAPC 2000–2024` = aapc_text(L[[k]], 2000, 2024), `AAPC 2000–2007` = aapc_text(L[[k]], 2000, 2007),
+    `AAPC 2008–2019` = aapc_text(L[[k]], 2008, 2019), `AAPC 2015–2024` = aapc_text(L[[k]], 2015, 2024))))
+}))
+knitr::kable(tableS4 |> filter(series %in% c("All ACSC", "Men", "Women", "ACSC share")))
+```
+
+## Figures S1 and S2: categories and groups
+
+```{r figureS1, fig.height = 5.5}
+CAT_COL <- setNames(c("#1f5f99", "#d9822b", "#2e8b57", "#8064a2"), CATEGORIES)
+REF <- list(geom_vline(xintercept = 2008, linetype = "dotted", colour = "grey45"),
+            geom_vline(xintercept = 2020 + 2 / 12, linetype = "dashed", colour = "grey45"))
+dS1 <- bind_rows(lapply(CATEGORIES, function(k) mutate(cats[[k]], category = k, fit = JP[[k]]$fitted)))
+figS1 <- ggplot(dS1, aes(year, asr, colour = category)) + REF +
+  geom_ribbon(aes(ymin = lcl, ymax = ucl, fill = category), alpha = 0.2, colour = NA) + geom_point(size = 1.2) +
+  geom_line(aes(y = fit), linewidth = 0.7) + facet_wrap(~ category, scales = "free_y") + expand_limits(y = 0) +
+  scale_colour_manual(values = CAT_COL, guide = "none") + scale_fill_manual(values = CAT_COL, guide = "none") +
+  labs(x = NULL, y = "Age-standardized rate per 100,000") + theme_classic()
+figS1
+```
+
+```{r figureS2, fig.height = 8.75}
+dS2 <- bind_rows(lapply(GROUPS$label, function(k) {
+  s <- grps[[k]]; f <- JP[[k]]; s$fit <- f$fitted[match(s$year, f$year)]
+  mutate(s, label = factor(sub("^0", "", sub(" ", ". ", k)), sub("^0", "", sub(" ", ". ", GROUPS$label))),
+         category = GROUPS$category[as.integer(substr(k, 1, 2))])
+}))
+figS2 <- ggplot(dS2, aes(year, asr, colour = category)) + REF + geom_point(size = 0.6) + geom_line(aes(y = fit), linewidth = 0.5) +
+  facet_wrap(~ label, scales = "free_y", ncol = 4, labeller = label_wrap_gen(30)) + expand_limits(y = 0) +
+  scale_colour_manual(values = CAT_COL, name = NULL) + scale_x_continuous(breaks = c(2000, 2012, 2024)) +
+  labs(x = NULL, y = "Age-standardized rate per 100,000") + theme_classic() +
+  theme(strip.text = element_text(size = 7), axis.text = element_text(size = 6.5), legend.position = "bottom")
+figS2
+```
+
 ## Figure 1
 
 ```{r figure1, fig.height = 8}
@@ -427,7 +608,8 @@ pB <- ggplot(ann, aes(year)) + REF + geom_line(aes(y = share, colour = "ACSC, % 
   geom_line(aes(y = per_1000 / 4, colour = "Hospitalizations per 1,000 (right axis)"), linetype = "22") +
   scale_y_continuous("% of hospitalizations", limits = c(0, 25), sec.axis = sec_axis(~ . * 4, name = "Hospitalizations per 1,000")) +
   scale_colour_manual(values = c("#1f5f99", "grey30"), name = NULL) + labs(x = NULL) + theme_classic() + theme(legend.position = "bottom")
-pA / pB + plot_annotation(tag_levels = "A")
+fig1 <- pA / pB + plot_annotation(tag_levels = "A")
+fig1
 ```
 
 # Step 8. Segmented regression: the 2008 reform and COVID-19
@@ -455,19 +637,22 @@ monthly_pop <- function(years) {
   g
 }
 month_series <- function(years, grp) monthly |> filter(year %in% years, group %in% grp) |> group_by(year, month) |> summarise(n = sum(n))
-its <- function(years, start, grp, offset = c("pop", "hosp")) {
+its <- function(years, start, grp, offset = c("pop", "hosp"), excl = 0) {
   offset <- match.arg(offset)
   d <- if (offset == "pop") monthly_pop(years) else rename(month_series(years, c(0:20, 99)), off = n)
   d <- left_join(d, month_series(years, grp), by = c("year", "month")) |> arrange(year, month)
   d$n[is.na(d$n)] <- 0; d$t <- seq_len(nrow(d)); t0 <- which(d$year == start[1] & d$month == start[2])
   d <- d |> mutate(post = as.integer(t >= t0), since = pmax(0, t - t0), s1 = sin(2 * pi * month / 12), c1 = cos(2 * pi * month / 12),
                    s2 = sin(4 * pi * month / 12), c2 = cos(4 * pi * month / 12))
-  m <- glm(n ~ t + post + since + s1 + c1 + s2 + c2 + offset(log(off)), family = quasipoisson(), data = d)
+  d$excluded <- d$t >= t0 & d$t < t0 + excl                       # months left out in a sensitivity analysis
+  m <- glm(n ~ t + post + since + s1 + c1 + s2 + c2 + offset(log(off)), family = quasipoisson(), data = d[!d$excluded, ])
   V <- NeweyWest(m, lag = 12, prewhite = FALSE, adjust = TRUE); b <- coef(m)
   pct <- function(l) { e <- sum(l * b[names(l)]); s <- sqrt(drop(t(l) %*% V[names(l), names(l)] %*% l))
                        c(est = 100 * (exp(e) - 1), lcl = 100 * (exp(e - 1.96 * s) - 1), ucl = 100 * (exp(e + 1.96 * s) - 1), p = 2 * pnorm(-abs(e / s))) }
   cf <- mutate(d, post = 0, since = 0)
   d$fitted <- predict(m, d, type = "response"); d$counterfactual <- predict(m, cf, type = "response")
+  ds <- mutate(d, s1 = 0, c1 = 0, s2 = 0, c2 = 0)                      # deseasonalized: Fourier terms at zero
+  d$trend <- predict(m, ds, type = "response"); d$trend_cf <- predict(m, mutate(ds, post = 0, since = 0), type = "response")
   list(effects = rbind(pre_trend = pct(c(t = 12)), level = pct(c(post = 1)), trend_change = pct(c(since = 12)),
                        post_trend = pct(c(t = 12, since = 12))),
        obs_exp = c(observed = sum(d$n[d$post == 1]), expected = sum(d$counterfactual[d$post == 1])), data = d)
@@ -507,16 +692,67 @@ covid$acsc$obs_exp
 its_plot <- function(f, title, scale = 1, ylab = "Hospitalizations per 100,000 per month") {
   d <- f$data |> mutate(date = as.Date(sprintf("%d-%02d-15", year, month)), rate = n / off * 1e5 * scale,
                         fit = fitted / off * 1e5 * scale, cf = counterfactual / off * 1e5 * scale)
-  ggplot(d, aes(date)) + geom_point(aes(y = rate), size = 0.6, colour = "grey35") +
-    geom_line(aes(y = cf), data = d[d$post == 1, ], colour = "#c0392b", linetype = "dashed") +
-    geom_line(aes(y = fit, group = post), colour = "#1f5f99") + expand_limits(y = 0) +
+  d <- d |> mutate(trend = trend / off * 1e5 * scale, trend_cf = trend_cf / off * 1e5 * scale)
+  ggplot(d, aes(date)) + geom_vline(xintercept = d$date[d$post == 1][1], colour = "grey40") +
+    geom_point(aes(y = rate), size = 0.6, colour = "grey35") +
+    geom_line(aes(y = trend_cf), data = d[d$post == 1, ], colour = "#c0392b", linetype = "dashed") +
+    geom_line(aes(y = trend, group = post), colour = "#1f5f99", linewidth = 0.7) + expand_limits(y = 0) +
     labs(x = NULL, y = ylab, subtitle = title) + theme_classic()
 }
-(its_plot(reform$acsc, "2008 reform: ACSC") | its_plot(reform$share, "2008 reform: ACSC share", 1e-3, "% of hospitalizations")) /
+figS4 <- (its_plot(reform$acsc, "2008 reform: ACSC") | its_plot(reform$share, "2008 reform: ACSC share", 1e-3, "% of hospitalizations")) /
   (its_plot(covid$acsc, "COVID-19: ACSC") | its_plot(covid$non_acsc, "COVID-19: non-ACSC")) + plot_annotation(tag_levels = "A")
+figS4
 ```
 
-The fitted lines here include the seasonal terms; the article shows the deseasonalized trend.
+Blue lines show the fitted trend without the seasonal cycle; red dashed lines, the trend projected as if the interruption had not happened.
+
+## Table 3: all series
+
+```{r table3}
+SER3 <- c(list(`All ACSC` = 1:20), lapply(setNames(CATEGORIES, CATEGORIES), function(k) GROUPS$group[GROUPS$category == k]),
+          list(`Non-ACSC` = c(0, 99)))
+DES <- list(`2008 reform` = list(years = 2000:2019, start = c(2008, 1)), `COVID-19` = list(years = 2012:2024, start = c(2020, 3)))
+fmt <- function(x) sprintf("%.1f (%.1f to %.1f)", x["est"], x["lcl"], x["ucl"])
+pfm <- function(p) ifelse(p < 0.001, "<0.001", sprintf("%.3f", p))
+table3 <- bind_rows(lapply(names(DES), function(dn) bind_rows(lapply(c(names(SER3), "ACSC share"), function(sn) {
+  f <- if (sn == "ACSC share") its(DES[[dn]]$years, DES[[dn]]$start, 1:20, "hosp") else its(DES[[dn]]$years, DES[[dn]]$start, SER3[[sn]])
+  e <- f$effects
+  tibble(design = dn, series = sn, `pre-trend, % per year` = fmt(e["pre_trend", ]), p1 = pfm(e["pre_trend", "p"]),
+         `level change, %` = fmt(e["level", ]), p2 = pfm(e["level", "p"]),
+         `change in trend, % per year` = fmt(e["trend_change", ]), p3 = pfm(e["trend_change", "p"]),
+         `O/E` = round(f$obs_exp[1] / f$obs_exp[2], 2))
+}))))
+knitr::kable(table3)
+```
+
+## By ACSC group (Supplementary Table S5)
+
+```{r tableS5}
+tableS5 <- bind_rows(lapply(names(DES), function(dn) bind_rows(lapply(1:20, function(g) {
+  f <- tryCatch(its(DES[[dn]]$years, DES[[dn]]$start, g), error = function(e) NULL)
+  if (is.null(f)) return(NULL)
+  e <- f$effects
+  tibble(design = dn, group = GROUPS$label[g], pre = fmt(e["pre_trend", ]), level = fmt(e["level", ]),
+         change = fmt(e["trend_change", ]), post = fmt(e["post_trend", ]), observed = f$obs_exp[1], expected = round(f$obs_exp[2]),
+         `O/E` = round(f$obs_exp[1] / f$obs_exp[2], 2))
+}))))
+knitr::kable(head(tableS5, 6))
+```
+
+## Sensitivity of the segmented regression
+
+```{r its-sensitivity}
+its_sens <- list(
+  `COVID-19, window 2015–2024` = its(2015:2024, c(2020, 3), 1:20)$effects["level", ],
+  `COVID-19, March–May 2020 left out` = its(2012:2024, c(2020, 3), 1:20, excl = 3)$effects["level", ],
+  `Reform, window 2000–2014` = its(2000:2014, c(2008, 1), 1:20)$effects["trend_change", ],
+  `Reform, interruption October 2008` = its(2000:2019, c(2008, 10), 1:20)$effects["trend_change", ],
+  `Reform, interruption January 2012` = s2012$acsc$effects["trend_change", ],
+  `Reform 2012, non-ACSC` = s2012$non_acsc$effects["trend_change", ],
+  `Reform 2012, ACSC share` = s2012$share$effects["trend_change", ])
+knitr::kable(do.call(rbind, its_sens), digits = 1)
+```
+
 
 # Step 9. Provinces
 
@@ -591,9 +827,107 @@ lisa |> filter(p < 0.05) |> mutate(name = PNAME[as.integer(province)])
 
 Morona Santiago is high-high in 2015–2019 and 2020–2024 and Pastaza in 2008–2014, but none remains significant after correction for multiple testing.
 
+With the four nearest provinces as neighbours, global autocorrelation is not significant in any period:
+
+```{r moran-knn}
+lw4 <- nb2listw(geo$nb$knn4, style = "W")
+sapply(names(YRS), function(p) { x <- PR[[p]]$asr[match(geo$province, PR[[p]]$province)]
+  set.seed(SEED); m <- moran.mc(x, lw4, nsim = 999); c(I = unname(m$statistic), p = m$p.value) }) |> round(3)
+```
+
+## Provincial trends
+
+For each province, a weighted log-linear regression of the annual rates gives the average change per year in 2000–2011 and 2011–2019.
+
+```{r provincial-trends}
+PY <- bind_rows(lapply(PROVS, function(p) bind_rows(lapply(2000:2024, function(y)
+  asr_of(U[U$year == y & U$province == p & U$acsc, ], pop[pop$year == y & pop$province == p, ]) |> mutate(province = p, year = y)))))
+wls_trend <- function(d, yrs) { d <- d[d$year %in% yrs, ]; m <- lm(log(asr) ~ year, data = d, weights = (asr / se)^2)
+  100 * (exp(c(coef(m)[2], confint(m)[2, ])) - 1) }
+trends <- bind_rows(lapply(PROVS, function(p) { d <- PY[PY$province == p, ]; a <- wls_trend(d, 2000:2011); b <- wls_trend(d, 2011:2019)
+  tibble(province = p, name = PNAME[as.integer(p)], apc_2000_2011 = a[1], lcl1 = a[2], ucl1 = a[3], apc_2011_2019 = b[1], lcl2 = b[2], ucl2 = b[3]) }))
+c(rose_2000_2011 = sum(trends$lcl1 > 0), fell_2011_2019 = sum(trends$ucl2 < 0), rose_2011_2019 = sum(trends$lcl2 > 0))
+```
+
+## Supplementary Table S2
+
+```{r tableS2}
+lisa_txt <- lisa |> filter(!is.na(p), p < 0.05) |>
+  mutate(txt = paste(c("High-High" = "HH", "Low-Low" = "LL", "High-Low" = "HL", "Low-High" = "LH")[quadrant], substr(period, 3, 4), "–", substr(period, 8, 9), sep = "")) |>
+  group_by(province) |> summarise(LISA = paste(txt, collapse = "; "))
+tableS2 <- bind_rows(lapply(names(YRS), function(p) transmute(PR[[p]], province, period = p, asr))) |>
+  pivot_wider(names_from = period, values_from = asr) |>
+  left_join(trends |> transmute(province, `APC 2011–2019` = sprintf("%.1f (%.1f to %.1f)", apc_2011_2019, lcl2, ucl2)), by = "province") |>
+  left_join(lisa_txt, by = "province") |> mutate(name = PNAME[as.integer(province)], region = REGION[as.integer(province)], .before = 1) |>
+  arrange(-`2000–2024`)
+knitr::kable(tableS2 |> select(-province), digits = 1)
+```
+
+## Annual indicators (Supplementary Tables S7 and S8, Figures S3 and S6)
+
+```{r annual-indicators, fig.height = 6.5}
+tableS7 <- PY |> mutate(name = PNAME[as.integer(province)]) |> select(name, year, asr) |> pivot_wider(names_from = year, values_from = asr)
+tableS8 <- bind_rows(lapply(2000:2024, function(y) {
+  a <- PY$asr[PY$year == y]; names(a) <- PY$province[PY$year == y]
+  set.seed(SEED); m <- moran.mc(a[geo$province], lw, nsim = 499, zero.policy = TRUE)
+  tibble(year = y, min = min(a), max = max(a), EQ = max(a) / min(a), CV = 100 * sd(a) / mean(a), SCV = scv_of(y),
+         moran_I = unname(m$statistic), moran_p = m$p.value)
+}))
+knitr::kable(tableS8, digits = 3)
+figS3 <- tableS8 |> transmute(year, `Coefficient of variation (%)` = CV, `Systematic component of variation (×100)` = SCV,
+                              `Global Moran's I (×100)` = 100 * moran_I, sig = moran_p < 0.05) |>
+  pivot_longer(-c(year, sig)) |>
+  ggplot(aes(year, value)) + geom_line(colour = "#1f5f99") + geom_point(colour = "#1f5f99") +
+  geom_point(data = function(d) d[d$sig & d$name == "Global Moran's I (×100)", ], shape = 21, size = 2.6, colour = "#c0392b") +
+  facet_wrap(~ name, ncol = 1, scales = "free_y") + expand_limits(y = 0) + labs(x = NULL, y = NULL) + theme_classic()
+figS3
+```
+
+```{r figureS6, fig.height = 6}
+ord <- PR$`2000–2024` |> arrange(asr) |> pull(province)
+figS6 <- PY |> mutate(name = factor(PNAME[as.integer(province)], PNAME[as.integer(ord)])) |>
+  ggplot(aes(year, name, fill = asr)) + geom_tile(colour = "white") +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1, name = "ASR per\n100,000") + labs(x = NULL, y = NULL) + theme_minimal()
+figS6
+```
+
+## Figures S7 and S9: local clusters and reference map
+
+```{r figureS7, fig.height = 7.5}
+LISA_COL <- c("High-High" = "#c0392b", "Low-Low" = "#2471a3", "High-Low" = "#f1948a", "Low-High" = "#85c1e9",
+              "Not significant" = "#e5e5e5", "No neighbours" = "#ffffff")
+ml <- merge(g, lisa, by = "province") |>
+  mutate(cluster = factor(ifelse(is.na(p), "No neighbours", ifelse(p < 0.05, quadrant, "Not significant")), names(LISA_COL)))
+figS7 <- ggplot(ml) + geom_sf(aes(fill = cluster), colour = "grey35", linewidth = 0.12) + facet_wrap(~ period, ncol = 2) +
+  scale_fill_manual(values = LISA_COL, drop = FALSE, name = "Local Moran's I") + theme_void() + theme(legend.position = "bottom")
+figS7
+```
+
+```{r figureS9, fig.height = 6.5}
+gref <- g |> mutate(name = PNAME[as.integer(province)], region = REGION[as.integer(province)])
+figS9 <- ggplot(gref) + geom_sf(aes(fill = region), colour = "grey35", linewidth = 0.2) +
+  ggrepel::geom_text_repel(aes(label = name, geometry = geometry), stat = "sf_coordinates", size = 2.3, seed = SEED) +
+  scale_fill_manual(values = c(Costa = "#d9ead3", Sierra = "#f4e3c1", Amazonía = "#cfe2f3", Galápagos = "#ead1dc"), name = NULL) +
+  ggspatial::annotation_scale(location = "bl") + ggspatial::annotation_north_arrow(location = "br", height = unit(8, "mm"), width = unit(6, "mm")) +
+  theme_void() + theme(legend.position = "bottom")
+figS9
+```
+
+## Rates by province of the hospital (sensitivity)
+
+The canton of the hospital is available from 2002, so this analysis covers 2002–2024.
+
+```{r occurrence}
+occ <- usable(annual |> filter(geo == "occ") |> mutate(acsc = group %in% 1:20))
+occ_rates <- bind_rows(lapply(PROVS, function(p) asr_of(occ[occ$year %in% 2002:2024 & occ$province == p & occ$acsc, ],
+                                                        pop[pop$year %in% 2002:2024 & pop$province == p, ]) |> mutate(name = PNAME[as.integer(p)])))
+occ_rates |> arrange(-asr) |> select(name, asr) |> head(4)
+```
+
 ## Figure 2
 
 ```{r figure2, fig.height = 7.5}
+fig2 <- local({
 pp4 <- bind_rows(lapply(PER, function(p) mutate(PR[[p]], period = p)))
 br <- quantile(pp4$asr, 0:5 / 5); br[c(1, 6)] <- br[c(1, 6)] + c(-1, 1)
 mp <- merge(g, pp4, by = "province") |> mutate(q = cut(asr, br, include.lowest = TRUE, dig.lab = 5))
@@ -605,6 +939,8 @@ ggplot(mp) + geom_sf(aes(fill = q), colour = "grey35", linewidth = 0.12) +
   ggspatial::annotation_north_arrow(data = data.frame(period = PER[1]), location = "br", height = unit(6, "mm"), width = unit(4.5, "mm")) +
   labs(caption = "Galápagos shown 7° east of its true position. Sources: INEC; boundaries ADM1 2024.") +
   theme_void() + theme(legend.position = "bottom")
+})
+fig2
 ```
 
 # Step 10. Hospital beds
@@ -702,32 +1038,127 @@ c(attributable_to_beds = 100 * (sum(ch$observed_2024) / sum(ch$observed_2024 * (
   observed_change = 100 * ((sum(ch$observed_2024) / sum(ch$expected_2024)) / (sum(ch$observed_2011) / sum(ch$expected_2011)) - 1))
 ```
 
+## Sensitivity of the bed models (Supplementary Table S9)
+
+```{r beds-sensitivity}
+fe_beds2 <- function(d, xv = "b10k", offset = "expected", lag = 0) {
+  d <- d |> arrange(province, year) |> group_by(province) |> mutate(x = if (lag) dplyr::lag(.data[[xv]], lag) else .data[[xv]]) |> ungroup()
+  d <- d[!is.na(d$x) & d$x > 0, ]; d$b10k <- d$x; fe_beds(d, offset)
+}
+beds <- beds |> mutate(b10k_raw = available / pop * 1e4, b10k_normal = normal_s / pop * 1e4)
+p_acsc <- panel_of(1:20); p_non <- panel_of(c(0, 99)); p_occ <- panel_of(1:20, "occ")
+p_share <- p_acsc |> left_join(p_non |> select(year, province, other = observed), by = c("year", "province")) |> mutate(all = observed + other)
+tableS9 <- rbind(
+  `ACSC hospitalization rate` = fe_beds(p_acsc), `Non-ACSC hospitalization rate` = fe_beds(p_non), `ACSC share` = fe_beds(p_share, "all"),
+  `ACSC, reported bed counts` = fe_beds2(p_acsc, "b10k_raw"), `ACSC, beds of normal allocation` = fe_beds2(p_acsc, "b10k_normal"),
+  `ACSC, beds lagged one year` = fe_beds2(p_acsc, lag = 1), `ACSC, 2020–2021 left out` = fe_beds(p_acsc[!p_acsc$year %in% 2020:2021, ]),
+  `ACSC, 2004–2024 only` = fe_beds(p_acsc[p_acsc$year >= 2004, ]),
+  `ACSC, split provinces left out 2000–2003` = fe_beds(p_acsc[!(p_acsc$year <= 2003 & p_acsc$province %in% c("09", "17", "23", "24")), ]),
+  `ACSC by province of the hospital` = fe_beds(p_occ), `ACSC share, reported bed counts` = fe_beds2(p_share, "b10k_raw", "all"))
+knitr::kable(tableS9[, 1:3], digits = 2)
+```
+
+## Do beds explain differences between provinces?
+
+Across provinces, the rank correlation between rates and bed density is weak. A regression of the log rate on log bed density explains little of the variation, and Moran's I of its residuals shows that the spatial pattern remains after allowing for beds.
+
+```{r beds-between}
+between <- bind_rows(lapply(names(YRS), function(p) {
+  bb <- beds |> filter(year %in% YRS[[p]]) |> group_by(province) |> summarise(b10k = sum(available_s) / sum(pop) * 1e4)
+  d <- left_join(PR[[p]], bb, by = "province"); ct <- suppressWarnings(cor.test(d$asr, d$b10k, method = "spearman"))
+  f <- lm(log(asr) ~ log(b10k), data = d); r <- residuals(f)[match(geo$province, d$province)]
+  set.seed(SEED); mr <- moran.mc(r, lw, nsim = 999, zero.policy = TRUE)
+  tibble(period = p, rho = unname(ct$estimate), p = ct$p.value, R2 = summary(f)$r.squared, moran_residuals = unname(mr$statistic), p_moran = mr$p.value)
+}))
+knitr::kable(between, digits = 3)
+```
+
+## Figure S8
+
+```{r figureS8, fig.height = 4.8}
+bp <- beds |> filter(year %in% c(2000, 2024)) |> mutate(name = PNAME[as.integer(province)])
+bp$name <- factor(bp$name, bp$name[bp$year == 2024][order(bp$b10k[bp$year == 2024])])
+s8a <- ggplot(bp, aes(b10k, name)) + geom_line(aes(group = name), colour = "grey70") + geom_point(aes(colour = factor(year)), size = 1.8) +
+  scale_colour_manual(values = c("2000" = "#9ecae1", "2024" = "#08519c"), name = NULL) + labs(x = "Beds per 10,000 population", y = NULL) + theme_classic()
+pb <- bind_rows(lapply(PER, function(p) {
+  bb <- beds |> filter(year %in% YRS[[p]]) |> group_by(province) |> summarise(b10k = sum(available_s) / sum(pop) * 1e4)
+  left_join(PR[[p]], bb, by = "province") |> mutate(period = p) }))
+s8b <- ggplot(pb, aes(b10k, asr, colour = period)) + geom_point() + geom_smooth(method = "lm", se = FALSE, linewidth = 0.5) +
+  scale_x_log10() + scale_y_log10() + scale_colour_manual(values = PCOL, name = NULL) +
+  labs(x = "Beds per 10,000 (log scale)", y = "ACSC rate per 100,000 (log scale)") + theme_classic()
+figS8 <- s8a + s8b + plot_annotation(tag_levels = "A")
+figS8
+```
+
 # Step 11. Sensitivity analyses
 
 The article reports several checks. Two examples:
 
 ```{r sensitivity}
-# WHO world standard instead of Ecuador 2022
-nat_who |> filter(year %in% c(2000, 2011, 2024)) |> select(year, asr)
-# without group 10 (genitourinary infection in pregnancy)
 no10 <- rate_series(function(d) d$acsc & d$group != 10)
-jp_fit(no10$year, no10$asr, no10$se, jp_select(no10$year, no10$asr, no10$se)$knots)$segments
+jp10 <- jp_fit(no10$year, no10$asr, no10$se, jp_select(no10$year, no10$asr, no10$se)$knots)
+pooled_sex <- function(sel) sapply(c("2", "1"), function(sx) asr_of(U[sel(U) & U$sex == sx, ], pop[pop$sex == sx, ])$asr)
+pr10 <- bind_rows(lapply(PROVS, function(p) asr_of(U[U$province == p & U$acsc & U$group != 10, ], pop[pop$province == p, ]) |> mutate(province = p)))
+set.seed(SEED); m10 <- moran.mc(pr10$asr[match(geo$province, pr10$province)], lw, nsim = 999, zero.policy = TRUE)
+tableS6 <- tribble(~analysis, ~measure, ~result,
+  "Main analysis", "National ASR 2000; 2011; 2024", paste(sprintf("%.1f", nat$asr[nat$year %in% c(2000, 2011, 2024)]), collapse = "; "),
+  "WHO world standard", "National ASR 2000; 2011; 2024", paste(sprintf("%.1f", nat_who$asr[nat_who$year %in% c(2000, 2011, 2024)]), collapse = "; "),
+  "Group 10 left out", "Joinpoint segments", seg_text(jp10),
+  "Main analysis", "Pooled ASR 2000–2024, women; men", paste(sprintf("%.0f", pooled_sex(function(d) d$acsc)), collapse = "; "),
+  "Group 10 left out", "Pooled ASR 2000–2024, women; men", paste(sprintf("%.0f", pooled_sex(function(d) d$acsc & d$group != 10)), collapse = "; "),
+  "Group 10 left out", "Global Moran's I 2000–2024", sprintf("%.2f (p = %.3f)", m10$statistic, m10$p.value),
+  "Province of the hospital, 2002–2024", "Highest provincial ASRs", paste(sprintf("%s %.1f", arrange(occ_rates, -asr)$name[1:4], arrange(occ_rates, -asr)$asr[1:4]), collapse = "; "))
+tableS6 <- bind_rows(tableS6, tibble(analysis = names(its_sens), measure = "Segmented regression (level or trend change)",
+                                     result = sapply(its_sens, function(x) sprintf("%.1f (%.1f to %.1f)", x[1], x[2], x[3]))))
+knitr::kable(tableS6)
 ```
 
 # Step 12. Saving the tables
 
 ```{r save}
-readr::write_csv(nat, file.path(OUT, "national_rates.csv"))
-readr::write_csv(table2, file.path(OUT, "table2_joinpoint.csv"))
-readr::write_csv(variation, file.path(OUT, "provincial_variation.csv"))
-readr::write_csv(as.data.frame(bed_models) |> tibble::rownames_to_column("model"), file.path(OUT, "bed_models.csv"))
-list.files(OUT)
+TABLES <- list(Table1_composition = table1_composition, Table1_rates = tibble::rownames_to_column(as.data.frame(table1_rates), "row"),
+               Table2 = table2, Table3 = table3, S1 = tableS1, S2 = tableS2, S3 = tableS3, S4 = tableS4, S5 = tableS5, S6 = tableS6,
+               S7 = tableS7, S8 = tableS8, S9 = tibble::rownames_to_column(as.data.frame(tableS9), "model"), S10 = tableS10,
+               national_rates = nat, provincial_variation = variation, moran = moran_by_period, lisa = lisa, bed_between = between)
+dir.create(file.path(OUT, "tables"), showWarnings = FALSE); dir.create(file.path(OUT, "figures"), showWarnings = FALSE)
+for (k in names(TABLES)) readr::write_csv(TABLES[[k]], file.path(OUT, "tables", paste0(k, ".csv")))
+writexl::write_xlsx(TABLES, file.path(OUT, "tables", "all_tables.xlsx"))
+FIGS <- list(Figure1 = list(fig1, 7, 8), Figure2 = list(fig2, 7.5, 7.7), FigureS1 = list(figS1, 7.5, 5.5), FigureS2 = list(figS2, 7.5, 8.75),
+             FigureS3 = list(figS3, 6.5, 6.5), FigureS4 = list(figS4, 7.5, 7), FigureS5 = list(figS5, 7.5, 4.5), FigureS6 = list(figS6, 7.5, 6),
+             FigureS7 = list(figS7, 7.5, 7.7), FigureS8 = list(figS8, 7.5, 4.8), FigureS9 = list(figS9, 7, 6.5))
+for (k in names(FIGS)) {
+  ggsave(file.path(OUT, "figures", paste0(k, ".tif")), FIGS[[k]][[1]], width = FIGS[[k]][[2]], height = FIGS[[k]][[3]], dpi = 300,
+         device = ragg::agg_tiff, compression = "lzw", bg = "white")
+  ggsave(file.path(OUT, "figures", paste0(k, ".png")), FIGS[[k]][[1]], width = FIGS[[k]][[2]], height = FIGS[[k]][[3]], dpi = 300,
+         device = ragg::agg_png, bg = "white")
+}
+list.files(file.path(OUT, "tables")); list.files(file.path(OUT, "figures"))
 ```
 
 ```{r compare, eval = nzchar(params$repo_results)}
 # Optional: compare with the results of the repository's analysis script
-r <- readr::read_csv(file.path(params$repo_results, "nat_total.csv"), show_col_types = FALSE)
-max(abs(r$asr - nat$asr))
+rr <- function(f) readr::read_csv(file.path(params$repo_results, paste0(f, ".csv")), show_col_types = FALSE)
+cmp <- function(what, mine, theirs) tibble(output = what, max_abs_difference = max(abs(mine - theirs)))
+pv <- rr("prov_period") |> mutate(province = sprintf("%02d", as.integer(province)))
+its_r <- rr("its_effects")
+comparison <- bind_rows(
+  cmp("National ASR", nat$asr, rr("nat_total")$asr),
+  cmp("ASR by category", unlist(lapply(CATEGORIES, function(k) cats[[k]]$asr)), unlist(lapply(CATEGORIES, function(k) rr("nat_category") |> filter(category == k) |> pull(asr)))),
+  cmp("Joinpoint APC, national", jp_nat$segments$apc, rr("jp_segments") |> filter(series == "Total") |> pull(apc)),
+  cmp("Reform, ACSC effects", reform$acsc$effects[, "est"], its_r |> filter(design == "reform", series == "All ACSC") |> pull(estimate)),
+  cmp("Provincial ASR 2000–2024", PR$`2000–2024`$asr, pv |> filter(period == "Total") |> arrange(province) |> pull(asr)),
+  cmp("Annual CV", tableS8$CV, rr("variation_by_year")$cv),
+  cmp("Annual Moran's I", tableS8$moran_I, rr("variation_by_year")$moran),
+  cmp("Provincial trends 2011–2019", trends$apc_2011_2019, rr("province_trend") |> mutate(province = sprintf("%02d", as.integer(province))) |> arrange(province) |> pull(apc_2011_2019)),
+  cmp("Bed models (11)", tableS9[, 1], rr("beds_models")$estimate),
+  cmp("Age-specific rates by sex and period", age_sex_period |> arrange(period, sex, b) |> pull(rate),
+      rr("age_sex_period") |> mutate(age_band = factor(gsub("-", "–", age_band), lab17)) |> arrange(period, sex, age_band) |> pull(rate)),
+  cmp("Systematic component of variation", tableS8$SCV, rr("variation_by_year")$scv),
+  cmp("Between-province Spearman rho", between$rho[1:4], rr("beds_between_province")$rho[1:4]),
+  cmp("Between-province R²", between$R2[1:4], rr("beds_between_province")$r2[1:4]),
+  cmp("Reform and COVID-19, ACSC share", c(reform$share$effects[, "est"], covid$share$effects[, "est"]),
+      its_r |> filter(series == "ACSC share of hospitalizations", design %in% c("reform", "covid")) |> arrange(design != "reform") |> pull(estimate)))
+knitr::kable(comparison, digits = 12)
 ```
 
 # Session
