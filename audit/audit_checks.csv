@@ -1,0 +1,33 @@
+area,check,max_abs_difference,tolerance,status,note
+Data,Annual discharges equal INEC published totals (series 1.4.2),1,1,PASS,"The 2014 microdata file has 1,192,750 records; INEC publishes 1,192,749"
+Data,Residence and occurrence files have the same totals,0,0,PASS,
+Data,Monthly file adds up to the annual file,0,0,PASS,
+Data,Obstetric file totals equal the annual file,0,0,PASS,
+Data,ICD-10 detail file adds up to ACSC totals,0,0,PASS,
+Data,Population equals INEC projections used in series 1.4.2,0,1,PASS,
+Data,Provincial beds (plus unassigned) equal national available beds,0,3,PASS,Differences of 1-2 beds come from rounding the 2004 shares used for Santo Domingo and Santa Elena in 2000-2003
+Data,Every ACSC group 1-20 present every year,0,0,PASS,
+Rates,National ASR 2000-2024 (independent),3.41e-13,1e-6,PASS,
+Rates,Gamma 95% CI of national ASR,4.55e-13,1e-6,PASS,
+Rates,ASR by sex,2.27e-13,1e-6,PASS,
+Rates,ASR by condition category,1.14e-13,1e-6,PASS,
+Rates,ASR by ACSC group (20 groups),5.68e-14,1e-6,PASS,
+Rates,ASR with WHO standard (sensitivity),3.41e-13,1e-6,PASS,
+Rates,Annual ACSC share of all discharges,1.78e-15,1e-9,PASS,
+Rates,"Annual discharges per 1,000 population",0,1e-9,PASS,
+Joinpoint,"APC and 95% CI of every segment, all series (refit)",9.27e-9,1e-6,PASS,
+Joinpoint,"AAPC 2000-2024 and 95% CI, all series (refit)",5.83e-10,1e-6,PASS,
+Joinpoint,Best single joinpoint of the national ASR is 2011,0,0,PASS,
+Joinpoint,Permutation tests (results/jp_tests.csv) select 1 joinpoint for the national series,0,0,PASS,Sequential tests at Bonferroni-corrected levels; not re-run here
+Segmented regression,"Trend, level and slope changes with 95% CI, 2008 reform and COVID-19 (refit)",2.13e-14,1e-6,PASS,
+Segmented regression,Observed and counterfactual hospitalizations after each interruption,1.46e-11,0.001,PASS,
+Segmented regression,Sensitivity: interruptions in January 2012 and October 2008 (refit),1.11e-14,1e-6,PASS,
+Provinces,Provincial ASR by period (independent),4.55e-13,1e-6,PASS,
+Provinces,"CV, extremal quotient and SCV by period (independent)",3.55e-15,1e-6,PASS,
+Provinces,"Global Moran's I, queen and 4-nearest neighbors (computed by hand)",5.55e-17,1e-9,PASS,
+Provinces,Moran's I permutation p-values and LISA p-values (same seed),2e-4,5e-4,PASS,"Provinces with one or two neighbors produce permutations that tie with the observed value; last-digit differences in the rates can move up to 4 of 9,999 ties"
+Provinces,Provincial trends 2000-2011 and 2011-2019 (independent),5.55e-13,1e-6,PASS,
+Beds,Smoothed bed density by province and year (independent),3.55e-15,1e-9,PASS,
+Beds,"Fixed-effects models: % change per 10% more beds with 95% CI, 11 models (independent cluster-robust sandwich)",3.19e-5,0.005,PASS,"Cluster-robust variance computed by hand (Liang-Zeger, cluster adjustment G/(G-1)); tolerance 0.005 percentage points"
+Beds,Contribution of bed changes 2011-2024 and change in standardized ratio,0,1e-6,PASS,
+Provinces,Annual CV (independent) equals results/variation_by_year.csv,7.11e-15,1e-6,PASS,

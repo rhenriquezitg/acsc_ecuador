@@ -1,0 +1,183 @@
+section,claim,reported,recomputed,source,status
+Methods,Total discharges 2000-2024,25074262,25074262,recomputed,PASS
+Methods,Records with partial three-character codes,237,237,recomputed,PASS
+Methods,Records with missing age,7337,7337,recomputed,PASS
+Methods,Records with missing or unknown sex,12,12,recomputed,PASS
+Methods,Residents abroad or in non-delimited zones,39270,39270,recomputed,PASS
+Methods,"Missing age, % of discharges",0.03,0.0293,recomputed,PASS
+Methods,"Residents abroad/ZND, % of discharges",0.16,0.1566,recomputed,PASS
+Methods,"O80-O84 as % of obstetric discharges, 2000",71,70.88,recomputed,PASS
+Methods,"O80-O84 as % of obstetric discharges, 2024",36,35.51,recomputed,PASS
+Methods,Bed values changed >25% by smoothing (of 600),21,21,recomputed,PASS
+Introduction,Discharges 2000 (millions),0.67,0.6719,recomputed,PASS
+Introduction,Discharges 2011 (millions),1.13,1.1336,recomputed,PASS
+Introduction,Population 2000 (millions),12.5,12.481,recomputed,PASS
+Introduction,Population 2024 (millions),18,17.967,recomputed,PASS
+Abstract/Results,ACSC hospitalizations,3792560,3792560,recomputed,PASS
+Abstract/Results,"ACSC share of all discharges, 2000-2024 (%)",15.1,15.125,recomputed,PASS
+Abstract/Results,"Discharges per 1,000, 2000",53.7,53.67,recomputed,PASS
+Abstract/Results,"Discharges per 1,000, 2011",74.6,74.627,recomputed,PASS
+Abstract/Results,"Discharges per 1,000, 2024",63,63.014,recomputed,PASS
+Abstract/Results,ACSC share 2000 (%),17,17.046,recomputed,PASS
+Abstract/Results,ACSC share 2011 (%),14.9,14.944,recomputed,PASS
+Abstract/Results,ACSC share 2024 (%),14.4,14.353,recomputed,PASS
+Abstract/Results,"Infectious conditions, % of ACSC",53.5,53.547,recomputed,PASS
+Abstract/Results,"Chronic conditions, % of ACSC",30.5,30.47,recomputed,PASS
+Abstract/Results,"Infectious gastroenteritis (group 12), % of ACSC",26.1,26.111,recomputed,PASS
+Abstract/Results,"Kidney and urinary tract infections (group 16), % of ACSC",11.9,11.949,recomputed,PASS
+Abstract/Results,"Diabetes (group 5), % of ACSC",9.4,9.432,recomputed,PASS
+Abstract/Results,"Prenatal care conditions (group 10), % of ACSC",6.7,6.688,recomputed,PASS
+Abstract/Results,"Children under five, % of ACSC, 2000-2007",23.7,23.724,recomputed,PASS
+Abstract/Results,"Children under five, % of ACSC, 2020-2024",17.3,17.333,recomputed,PASS
+Abstract/Results,"Aged 65+, % of ACSC, 2000-2007",19.8,19.801,recomputed,PASS
+Abstract/Results,"Aged 65+, % of ACSC, 2020-2024",28.6,28.624,recomputed,PASS
+Abstract/Results,ASR 2000,1016.6,1016.607,recomputed,PASS
+Abstract/Results,ASR 2010 (peak),1195.9,1195.864,recomputed,PASS
+Abstract/Results,Year of peak ASR,2010,2010,recomputed,PASS
+Abstract/Results,ASR 2024,897.2,897.166,recomputed,PASS
+Abstract/Results,ASR 2024 below peak (%),25,24.978,recomputed,PASS
+Abstract/Results,APC 2000-2011,2,2.01,recomputed,PASS
+Abstract/Results,APC 2000-2011 lower CI,0.4,0.375,recomputed,PASS
+Abstract/Results,APC 2000-2011 upper CI,3.7,3.672,recomputed,PASS
+Abstract/Results,APC 2000-2011 p-value,0.018,0.01821,recomputed,PASS
+Abstract/Results,APC 2011-2024,-3.1,-3.098,recomputed,PASS
+Abstract/Results,APC 2011-2024 lower CI,-4.3,-4.27,recomputed,PASS
+Abstract/Results,APC 2011-2024 upper CI,-1.9,-1.911,recomputed,PASS
+Abstract/Results,AAPC 2000-2024,-0.8,-0.789,recomputed,PASS
+Abstract/Results,AAPC lower CI,-1.4,-1.442,recomputed,PASS
+Abstract/Results,AAPC upper CI,-0.1,-0.133,recomputed,PASS
+Abstract/Results,Joinpoint in men,2010,2010,recomputed,PASS
+Abstract/Results,Share: number of joinpoints,0,0,recomputed,PASS
+Abstract/Results,Share APC 2000-2024,-1.1,-1.065,recomputed,PASS
+Abstract/Results,Share APC lower CI,-1.4,-1.414,recomputed,PASS
+Abstract/Results,Share APC upper CI,-0.7,-0.713,recomputed,PASS
+Abstract/Results,Vaccine-preventable APC until 2010,-11.7,-11.698,recomputed,PASS
+Abstract/Results,Vaccine-preventable first joinpoint,2010,2010,recomputed,PASS
+Abstract/Results,Gastroenteritis: joinpoint year,2007,2007,recomputed,PASS
+Abstract/Results,Gastroenteritis APC after 2007,-5.9,-5.932,recomputed,PASS
+Abstract/Results,Diabetes: decline starts,2011,2011,recomputed,PASS
+Abstract/Results,Urinary tract infections: decline starts,2013,2013,recomputed,PASS
+Abstract/Results,"J15.9 hospitalizations, 2000",106,106,recomputed,PASS
+Abstract/Results,"J15.9 hospitalizations, 2018 (between 9,500 and 10,000)",1,1,recomputed,PASS
+Abstract/Results,"J15.9 hospitalizations, 2019 (between 9,500 and 10,000)",1,1,recomputed,PASS
+Abstract/Results,"Women/men rate ratio 15-34 years, minimum",2.3,2.255,recomputed,PASS
+Abstract/Results,"Women/men rate ratio 15-34 years, maximum",3.1,3.068,recomputed,PASS
+Provinces,Lowest provincial ASR 2000-2024 (Orellana),800.3,800.303,recomputed,PASS
+Provinces,Orellana is the lowest,1,1,recomputed,PASS
+Provinces,Highest provincial ASR 2000-2024 (Morona Santiago),2162.4,2162.404,recomputed,PASS
+Provinces,"Five highest: Morona Santiago, Pastaza, Napo, Zamora Chinchipe, Canar",1,1,recomputed,PASS
+Provinces,CV 2000-2007,38.3,38.329,recomputed,PASS
+Provinces,"CV later periods, minimum",29.8,29.829,recomputed,PASS
+Provinces,"CV later periods, maximum",30.9,30.948,recomputed,PASS
+Provinces,SCV 2000-2007,16.6,16.629,recomputed,PASS
+Provinces,"SCV later periods, minimum",10.8,10.816,recomputed,PASS
+Provinces,"SCV later periods, maximum",13.4,13.385,recomputed,PASS
+Provinces,Highest annual CV (2003),42.5,42.508,recomputed,PASS
+Provinces,Year of highest annual CV,2003,2003,recomputed,PASS
+Provinces,Lowest annual CV (2011),24.8,24.793,recomputed,PASS
+Provinces,Year of lowest annual CV,2011,2011,recomputed,PASS
+Provinces,Provinces with significant rise 2000-2011,15,15,recomputed,PASS
+Provinces,Provinces with significant fall 2011-2019,11,11,recomputed,PASS
+Provinces,Only Zamora Chinchipe rose significantly 2011-2019,1,1,recomputed,PASS
+Provinces,Moran's I 2000-2007,0.08,0.0833,recomputed,PASS
+Provinces,Moran's I 2000-2007 p-value,0.103,0.103,"results (permutation, reproduced above)",PASS
+Provinces,"Moran's I later periods, minimum",0.24,0.2439,recomputed,PASS
+Provinces,"Moran's I later periods, maximum",0.3,0.3035,recomputed,PASS
+Provinces,"Moran's I later periods, largest p-value <= 0.013",1,1,"results (permutation, reproduced above)",PASS
+Provinces,Annual Moran's I significant every year from 2009,1,1,results/variation_by_year.csv (499 permutations),PASS
+Provinces,"Empirical Bayes Moran's I, minimum 2008-2024 periods",0.29,0.2932,results (reproduced above),PASS
+Provinces,"Empirical Bayes Moran's I, maximum 2008-2024 periods",0.36,0.3572,results (reproduced above),PASS
+Provinces,Moran's I with 4 nearest neighbors not significant in any period,1,1,results,PASS
+Provinces,"LISA high-high: Morona Santiago 2015-2019 and 2020-2024, Pastaza 2008-2014 only",1,1,recomputed,PASS
+Provinces,No province significant after FDR correction,0,0,recomputed,PASS
+Beds,"National beds per 10,000, 2000",15.7,15.676,recomputed,PASS
+Beds,"National beds per 10,000, 2011",16.2,16.19,recomputed,PASS
+Beds,"National beds per 10,000, 2024",13.2,13.206,recomputed,PASS
+Beds,Provinces with fewer beds per inhabitant in 2024 than 2011,13,13,recomputed,PASS
+Beds,Lowest bed density 2000-2024 (Orellana),7.7,7.681,recomputed,PASS
+Beds,Orellana lowest,1,1,recomputed,PASS
+Beds,Highest bed density 2000-2024 (Tungurahua),18.9,18.85,recomputed,PASS
+Beds,Tungurahua highest,1,1,recomputed,PASS
+Beds,ACSC: % per 10% more beds,4.5,4.538,recomputed,PASS
+Beds,ACSC lower CI,3.3,3.253,recomputed,PASS
+Beds,ACSC upper CI,5.8,5.84,recomputed,PASS
+Beds,Non-ACSC: % per 10% more beds,4.8,4.842,recomputed,PASS
+Beds,Non-ACSC lower CI,3.6,3.617,recomputed,PASS
+Beds,Non-ACSC upper CI,6.1,6.081,recomputed,PASS
+Beds,Share: % per 10% more beds,-0.4,-0.376,recomputed,PASS
+Beds,Share lower CI,-1.4,-1.362,recomputed,PASS
+Beds,Share upper CI,0.6,0.619,recomputed,PASS
+Beds,"ACSC sensitivity analyses, minimum",2.7,2.73,recomputed,PASS
+Beds,"ACSC sensitivity analyses, maximum",6.2,6.222,recomputed,PASS
+Beds,Reduction attributable to beds 2011-2024 (%),-5.7,-5.718,recomputed,PASS
+Beds,Observed change in standardized ratio 2011-2024 (%),-22.1,-22.129,recomputed,PASS
+Beds,Share of the decline attributable to beds (about a quarter),0.25,0.258,recomputed,PASS
+Beds,"Spearman rho by period, minimum",0.25,0.2522,recomputed,PASS
+Beds,"Spearman rho by period, maximum",0.43,0.4339,recomputed,PASS
+Beds,Spearman p-value 2000-2007,0.035,0.03528,recomputed,PASS
+Beds,Spearman not significant after 2007,1,1,recomputed,PASS
+Beds,"Variance of provincial rates explained by beds, 2000-2024 (%)",6,5.99,recomputed,PASS
+Beds,"Moran's I of residuals 2008-2024 periods, minimum",0.18,0.1756,recomputed,PASS
+Beds,"Moran's I of residuals 2008-2024 periods, maximum",0.22,0.2221,recomputed,PASS
+Segmented regression,Reform: ACSC pre-trend (% per year),2.8,2.795,recomputed,PASS
+Segmented regression,Reform: ACSC level change (%),7.1,7.064,recomputed,PASS
+Segmented regression,Reform: ACSC level change lower CI,1.4,1.409,recomputed,PASS
+Segmented regression,Reform: ACSC level change upper CI,13,13.035,recomputed,PASS
+Segmented regression,Reform: ACSC change in trend,-3.7,-3.699,recomputed,PASS
+Segmented regression,Reform: ACSC change in trend lower CI,-4.7,-4.73,recomputed,PASS
+Segmented regression,Reform: ACSC change in trend upper CI,-2.7,-2.657,recomputed,PASS
+Segmented regression,Reform: ACSC post-interruption trend,-1,-1.008,recomputed,PASS
+Segmented regression,Reform: non-ACSC level change,15.4,15.421,recomputed,PASS
+Segmented regression,Reform: non-ACSC level change lower CI,8.5,8.541,recomputed,PASS
+Segmented regression,Reform: non-ACSC level change upper CI,22.7,22.737,recomputed,PASS
+Segmented regression,Reform: non-ACSC change in trend,-3.2,-3.227,recomputed,PASS
+Segmented regression,Reform: non-ACSC change in trend lower CI,-4,-3.987,recomputed,PASS
+Segmented regression,Reform: non-ACSC change in trend upper CI,-2.5,-2.461,recomputed,PASS
+Segmented regression,Reform: chronic level change,19.2,19.177,recomputed,PASS
+Segmented regression,Reform: chronic level change lower CI,10.3,10.316,recomputed,PASS
+Segmented regression,Reform: chronic level change upper CI,28.7,28.75,recomputed,PASS
+Segmented regression,Reform: share pre-trend,-0.1,-0.08,recomputed,PASS
+Segmented regression,Reform: share level change,-6,-6.026,recomputed,PASS
+Segmented regression,Reform: share level change CI (3.6),-3.6,-3.628,recomputed,PASS
+Segmented regression,Reform: share level change CI (8.4),-8.4,-8.364,recomputed,PASS
+Segmented regression,Reform: share post-interruption trend,-0.5,-0.512,recomputed,PASS
+Segmented regression,"Reform: ACSC below pre-reform share, 2008-2019 (%)",8.5,8.461,recomputed,PASS
+Segmented regression,Reform: share O/E (Table 3),0.92,0.9154,recomputed,PASS
+Segmented regression,January 2012: ACSC change in trend,-4.2,-4.182,recomputed,PASS
+Segmented regression,January 2012: ACSC change in trend CI,-4.9,-4.883,recomputed,PASS
+Segmented regression,January 2012: ACSC change in trend CI ,-3.5,-3.476,recomputed,PASS
+Segmented regression,January 2012: non-ACSC change in trend,-5.1,-5.107,recomputed,PASS
+Segmented regression,January 2012: non-ACSC change in trend CI,-5.7,-5.702,recomputed,PASS
+Segmented regression,January 2012: non-ACSC change in trend CI ,-4.5,-4.508,recomputed,PASS
+Segmented regression,January 2012: share change in trend,0.8,0.799,recomputed,PASS
+Segmented regression,January 2012: share change in trend CI,0.4,0.364,recomputed,PASS
+Segmented regression,January 2012: share change in trend CI ,1.2,1.236,recomputed,PASS
+Segmented regression,COVID: ACSC pre-trend,-1.7,-1.724,recomputed,PASS
+Segmented regression,COVID: ACSC level change,-44,-44.047,recomputed,PASS
+Segmented regression,COVID: ACSC level CI (30.6),-30.6,-30.615,recomputed,PASS
+Segmented regression,COVID: ACSC level CI (54.9),-54.9,-54.878,recomputed,PASS
+Segmented regression,COVID: non-ACSC level change,-17.3,-17.258,recomputed,PASS
+Segmented regression,COVID: non-ACSC level CI (6.1),-6.1,-6.122,recomputed,PASS
+Segmented regression,COVID: non-ACSC level CI (27.1),-27.1,-27.073,recomputed,PASS
+Segmented regression,COVID: share level change,-29.7,-29.703,recomputed,PASS
+Segmented regression,COVID: share level CI (21.5),-21.5,-21.472,recomputed,PASS
+Segmented regression,COVID: share level CI (37.1),-37.1,-37.07,recomputed,PASS
+Segmented regression,COVID: ACSC observed Mar 2020-Dec 2024,671555,671555,recomputed,PASS
+Segmented regression,COVID: ACSC expected,818625,818625.39,recomputed,PASS
+Segmented regression,COVID: ACSC below expected (%),18,17.966,recomputed,PASS
+Segmented regression,COVID: non-ACSC below expected (%),3.8,3.775,recomputed,PASS
+Segmented regression,COVID: vaccine-preventable level change,-69.6,-69.576,recomputed,PASS
+Segmented regression,COVID: infectious level change,-48.7,-48.674,recomputed,PASS
+Segmented regression,COVID: chronic level change,-33.8,-33.753,recomputed,PASS
+Segmented regression,COVID: chronic below expected (%),4,3.66,recomputed,PASS
+Segmented regression,COVID-coded discharges 2020,55076,55076,data (microdata count),PASS
+Segmented regression,COVID-coded discharges 2021,64491,64491,data (microdata count),PASS
+Segmented regression,ACSC pneumonia codes 2019,10330,10330,data (microdata count),PASS
+Segmented regression,ACSC pneumonia codes 2020,4800,4800,data (microdata count),PASS
+Segmented regression,ACSC pneumonia codes 2021,2477,2477,data (microdata count),PASS
+Discussion,"Rise in discharges per 1,000, 2000-2011 (%)",39,39.05,recomputed,PASS
+Discussion,Growth in discharges 2000-2014 (%),78,77.52,recomputed,PASS
+Discussion,"Bacterial pneumonia, fold increase 2010-2018 (about fivefold)",5,5.27,recomputed,PASS
+Discussion,"COVID-coded discharges 2020-2021 (almost 120,000)",120,119.57,recomputed,PASS
+Discussion,Free care raised other hospitalizations (15%),15,15.42,recomputed,PASS
+Discussion,and ACSC (7%),7,7.06,recomputed,PASS

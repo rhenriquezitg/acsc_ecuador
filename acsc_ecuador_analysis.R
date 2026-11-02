@@ -592,6 +592,18 @@ if (REBUILD_FROM_MICRODATA) {
                    file.path(DATA, "covid_codes_2019_2024.csv"))
 }
 
+# Annual obstetric (O00-O99), delivery (O80-O84) and perinatal (P00-P96) discharges
+# (data/obstetric_discharges_2000_2024.csv), used to justify the share denominator.
+if (REBUILD_FROM_MICRODATA) {
+  ob <- inectab::open_cache(CACHE_DIR) |> filter(.data$dataset == "egresos") |>
+    mutate(ch = substr(.data$icd10, 1, 1), c3 = substr(.data$icd10, 1, 3)) |>
+    group_by(year = .data$event_year) |>
+    summarise(all_discharges = n(), obstetric_O00_O99 = sum(ch == "O", na.rm = TRUE),
+              deliveries_O80_O84 = sum(c3 >= "O80" & c3 <= "O84", na.rm = TRUE),
+              perinatal_P00_P96 = sum(ch == "P", na.rm = TRUE)) |> collect()
+  readr::write_csv(arrange(ob, year), file.path(DATA, "obstetric_discharges_2000_2024.csv"))
+}
+
 # Provincial beds 2000-2003 from the INEC establishment-level files; 2004-2024 come from the
 # published historical series (Tabulados_series_ECEH_2024.xlsx, series 1.5.2 and 1.5.3).
 beds_2000_2003 <- function(raw_dir = BEDS_RAW_DIR) {

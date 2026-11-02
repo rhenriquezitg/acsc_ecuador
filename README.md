@@ -18,6 +18,8 @@ The study describes hospitalizations for ambulatory care sensitive conditions (A
 | Path | Content |
 |---|---|
 | `acsc_ecuador_analysis.R` | Single script that reproduces every number, table and figure of the article and its supplementary material |
+| `acsc_ecuador_audit.R` | Independent audit: data integrity checks, re-implementation of every method and a register of the numbers quoted in the manuscript |
+| `audit/` | Audit outputs: `audit_checks.csv`, `audit_claims.csv`, `audit_report.txt` |
 | `supplementary/Supplementary_material.docx` (and `.pdf`) | Tables S1–S3 and Figures S1–S9 |
 | `supplementary/Table_S4.xlsx` | Joinpoint regression of all series |
 | `supplementary/Table_S5.xlsx` | Segmented regression by ACSC group |
@@ -46,6 +48,7 @@ The study describes hospitalizations for ambulatory care sensitive conditions (A
 | `beds_province.csv` | Available beds and beds of normal allocation by province of the establishment, 2000–2024: INEC establishment files for 2000–2003 and series 1.5.2 and 1.5.3 for 2004–2024 |
 | `beds_unassigned_2000_2003.csv` | Beds of establishments with an unassigned province code in the 2001–2003 files (left out) |
 | `beds_national.csv` | National population, beds, discharges and bed occupancy, 1997–2024 (INEC series 1.4.2) |
+| `obstetric_discharges_2000_2024.csv` | Annual obstetric (O00–O99), delivery (O80–O84) and perinatal (P00–P96) discharges, from the microdata |
 | `covid_codes_2019_2024.csv` | Discharges coded as COVID-19 (U07–U10), pneumonia (J12–J18) and the ACSC pneumonia codes, 2019–2024, from the microdata |
 | `provinces_geo.rds` | Provincial boundaries (ADM1 2024) and neighbour lists (queen contiguity and 4 nearest neighbours) |
 
@@ -77,7 +80,29 @@ install.packages(c("dplyr", "tidyr", "readr", "ggplot2", "patchwork", "sf", "spd
 Rscript acsc_ecuador_analysis.R
 ```
 
-The script takes a few minutes and writes `results/` and `figures/`. The package versions used are listed in `results/session_info.txt`.
+The script takes a few minutes and writes `results/` and `figures/`.
+
+### Auditing the results
+
+```sh
+Rscript acsc_ecuador_audit.R
+```
+
+The audit script reads `data/` and `results/` and works in four steps:
+
+1. **Data integrity.** It checks the aggregated data against totals published by INEC: annual discharges, population and beds.
+2. **Independent re-implementation.** It recomputes the results without using the functions of the analysis script:
+   - age-standardized rates and their gamma confidence intervals;
+   - every joinpoint model, refitted with its joinpoints, plus an exhaustive search for the location of the national joinpoint;
+   - every segmented regression, including the sensitivity analyses;
+   - provincial rates, CV, extremal quotient and SCV;
+   - Moran's I computed by hand, with permutation, empirical Bayes and LISA p-values reproduced;
+   - provincial trends;
+   - bed smoothing, and the fixed-effects models with a cluster-robust variance computed by hand.
+3. **Claims register.** It compares each number quoted in the manuscript with the recomputed value, at the precision printed in the text.
+4. **Report.** It writes PASS or FAIL for each check and PASS or CHECK for each claim.
+
+Two steps are not repeated: the classification of the 25 million records, which needs the INEC microdata (see the record log), and the joinpoint permutation tests. For those tests the script reports the result stored in `results/jp_tests.csv`. The package versions used are listed in `results/session_info.txt`.
 
 ## License
 
